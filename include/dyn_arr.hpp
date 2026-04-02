@@ -1,37 +1,33 @@
 #pragma once
-#include "array_sequence.hpp"
-
-
 
 template<typename T>
-class vector : private array_sequence;
+class dyn_arr : private array_sequence;
 {
     
     private:
         T* data_;
-        size_t capacity_;
         size_t size_;
     public:
-        vector () : data_(nullptr), capacity_(0), size_(0) {}
-        explicit vector(size_t initial_capacity)
-            : data_(new T[initial_capacity]), capacity_(initial_capacity), size_(initial_capacity) {
+        dyn_arr () : data_(nullptr), capacity_(0), size_(0) {}
+        explicit dyn_arr(size_t initial_capacity)
+            : data_(new T[initial_capacity]), size_(initial_capacity) {
             for (size_t i = 0; i < initial_capacity; ++i) {
-                data_[i] = T();  // Или nullptr для указателей
+                data_[i] = T();  // или nullptr для указателей
             }
         }
-        ~vector() {
+        ~dyn_arr() {
             delete[] data_;
         }
 
-        vector(const vector& ) = delete;
+        dyn_arr(const vector& ) = delete;
         vector& operator=(const vector&) = delete;
 
-        vector(vector&& other) noexcept : data_(other.data_), capacity_(other.capacity_), size_(other.size_) {
+        dyn_arr(vector&& other) noexcept : data_(other.data_), size_(other.size_) {
             other.data_ = nullptr;
             other.capacity_ = 0;
             other.size_ = 0;
         }
-        vector& operator=(vector&& other) noexcept{
+        dyn_arr& operator=(r&& other) noexcept{
             std::swap(data_, other.data_);
             std::swap(capacity_, other.capacity_);
             std::swap(size_, other.size_);
@@ -73,7 +69,7 @@ class vector : private array_sequence;
 
         const T* end() const { return data_ + size_; }
         void pop_back() {
-            if (size_ == 0) throw std::out_of_range("Vector is empty");
+            if (size_ == 0) throw std::out_of_range("dynamic array is empty");
             --size_;
         }
         
@@ -82,10 +78,10 @@ class vector : private array_sequence;
                 reserve(capacity_ == 0 ? 16 : capacity_ * 2);
             }
             data_[size_] = val;
-            ++size_;
+            size_++;
         }
         
-        void push_back(T&& val) {
+        void append(T&& val) {
             if (size_ >= capacity_) {
                 reserve(capacity_ == 0 ? 16 : capacity_ * 2);
             }
