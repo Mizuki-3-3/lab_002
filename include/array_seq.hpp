@@ -7,72 +7,45 @@ template<typename T>
 class array_sequence: private sequence
 {
 private:
-    dyn_arr ;
+    dyn_arr<T> arr;
     unsigned size_;
 public:
 
     T& back() {
-        if (size_ == 0) throw std::out_of_range("Vector is empty");
-        return data_[size_ - 1];
+        if (size_ == 0 || arr.size() == 0) throw std::out_of_range("dynamic array is empty");
+        return arr.data()[size_ - 1];
     }
 
     const T& back() const {
-        if (size_ == 0) throw std::out_of_range("Vector is empty");
-        return data_[size_ - 1];
-    }
-    [[nodiscard]] size_t size() const { return size_;}
-
-    [[nodiscard]] size_t capacity() const { return capacity_;}
-        
-    [[nodiscard]] bool empty() const { return size_ == 0;}
-
-    T* data() { return data_; }
-
-    const T* data() const { return data_; }
-
-    T* begin() { return data_; }
-
-    T* end() { return data_ + size_; }
-
-    const T* end() const { return data_ + size_; }
-    void pop_back() {
-        if (size_ == 0) throw std::out_of_range("dynamic array is empty");
-        --size_;
-    }
-        
-    void push_back(const T& val) {
-        if (size_ >= capacity_) {
-            reserve(capacity_ == 0 ? 16 : capacity_ * 2);
-        }
-        data_[size_] = val;
-        size_++;
+        if (size_ == 0 || arr.size() == 0) throw std::out_of_range("dynamic array is empty");
+        return arr.data()[size_ - 1];
     }
         
     void append(T&& val) {
-        if (size_ >= capacity_) {
+        if (size >= arr.size()) {
             reserve(capacity_ == 0 ? 16 : capacity_ * 2);
         }
         data_[size_] = std::move(val);
         ++size_;
     }
 
-    void reserve(size_t new_capacity) {
-        if (new_capacity > capacity_) {
+    void reserve(unsigned new_capacity) {
+        if (new_capacity > size_) {
             T* new_data = new T[new_capacity];
 
-            for (size_t i = 0; i < size_; ++i) {
+            for (unsigned i = 0; i < size_; ++i) {
                 new_data[i] = std::move(data_[i]);
             }
 
             delete[] data_;
             data_ = new_data;
-            capacity_ = new_capacity;
+            size_ = new_capacity;
         }
     }
-    void resize(size_t new_size, const T& value = T()) {
-        if (new_size > capacity_) {
+    void resize(unsigned new_size, const T& value = T()) {
+        if (new_size > size_) {
 
-            size_t new_capacity = capacity_ == 0 ? new_size : capacity_ * 2;
+            unsigned new_size = size_ == 0 ? new_size : capacity_ * 2;
             if (new_capacity < new_size) {
                     new_capacity = new_size;
             }

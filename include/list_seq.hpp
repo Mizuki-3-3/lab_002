@@ -3,25 +3,41 @@
 #include "linked_list.hpp"
 
 template <typename T>
-class list_sequence: private sequence private list
+class list_sequence: private sequence, private s_list
 {
 private:
-    unsigned size;
-    list list_;
+    s_list<T> list_s;
 public:
-    T get_first(){return head->value;}
+    void append(T val_for_new){
+        list_s.size++;
+        list_s.tail->next = new node<T>(val_for_new);
+        list_s.tail = list_s.tail->next;
+    }
+    void prepend(T val_for_new){
+        list_s.size++;
+        list_s.tail->next = new node<T>(val_for_new);
+        list_s.tail->next->next = list_s.head;
+        list_s.head = list_s.tail->next; //закольцевали и разорвали
+        list_s.tail->next = nullptr;
+    }
 
-    T get_last(){return tail->value;}
-
-    void add(T val_for_new){
-        size++;
-        node<T>* temp = new node<T>(T());
-        temp->value = 
-        tail->next = temp;
-        tail = temp; 
-    };
-    [[nodiscard]] size_t size() const { return size_;}
-        
-    [[nodiscard]] bool empty() const { return size_ == 0;}
-
+    void insert(T value, unsigned index){
+        node<T>* current = list_s.head;
+        for (unsigned i = 0; i < index-1; i++){current = current->next;}
+        node<T>* temp = current->next;
+        current->next = new node<T>(T());
+        current = current->next;
+        current->value = value;
+        current->next = temp;
+    }
+    unsigned find(T wanted){
+        node<T>* current = list_s.head;
+        for (unsigned i = 0; i < list_s.size();i++){
+            if (current->value == wanted){
+                return i;
+            }
+            current = current->next
+        }
+        throw std::out_of_range("not_found")
+    }
 };
