@@ -8,36 +8,25 @@ class array_sequence: private sequence
 {
 private:
     dyn_arr<T> arr;
-    unsigned size_;
+    unsigned size_; ////(capacity)
 public:
-
-    T& back() {
-        if (size_ == 0 || arr.size() == 0) throw std::out_of_range("dynamic array is empty");
-        return arr.data()[size_ - 1];
-    }
-
-    const T& back() const {
-        if (size_ == 0 || arr.size() == 0) throw std::out_of_range("dynamic array is empty");
-        return arr.data()[size_ - 1];
-    }
         
-    void append(T&& val) {
-        if (size >= arr.size()) {
+    void append(T& val) {
+        if (size >= arr.len()) {
             reserve(capacity_ == 0 ? 16 : capacity_ * 2);
         }
         data_[size_] = std::move(val);
         ++size_;
     }
 
-    void reserve(unsigned new_capacity) {
-        if (new_capacity > size_) {
-            T* new_data = new T[new_capacity];
+    void reserve(unsigned new_size) {
+        if (new_size > arr.len()) {
+            T* new_data = new T[new_size];
 
-            for (unsigned i = 0; i < size_; ++i) {
+            for (unsigned i = 0; i < new_size; ++i) {
                 new_data[i] = std::move(data_[i]);
             }
-
-            delete[] data_;
+            delete[] arr.;
             data_ = new_data;
             size_ = new_capacity;
         }
@@ -52,12 +41,12 @@ public:
             reserve(new_capacity);
         }
         if (new_size > size_) {
-            for (size_t i = size_; i < new_size; ++i) {
+            for (unsigned i = size_; i < new_size; ++i) {
                 new (data_ + i) T(value);
             }
         } else if (new_size < size_) {
 
-            for (size_t i = new_size; i < size_; ++i) {
+            for (unsigned i = new_size; i < size_; ++i) {
                 (data_ + i)->~T();
             }
         }

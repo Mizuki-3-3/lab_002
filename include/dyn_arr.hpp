@@ -4,59 +4,62 @@ template<typename T>
 class dyn_arr :
 {
     private:
-        T* data_;
-        unsigned size_;
+        T* data;
+        unsigned size;
     public:
-        dyn_arr () : data_(nullptr), capacity_(0), size_(0) {}
-        explicit dyn_arr(size_t initial_size)
-            : data_(new T[initial_size]), size_(initial_size) {
-            for (size_t i = 0; i < initial_size; ++i) {
-                data_[i] = T();  // или nullptr для указателей
+        dyn_arr () : data(nullptr), size(0) {}
+        explicit dyn_arr(unsigned initial_size): data(new T[initial_size]), size(initial_size) {
+            for (unsigned i = 0; i < initial_size; ++i) {
+                data[i] = T();  // или nullptr для указателей
             }
         }
-        ~dyn_arr() {
-            delete[] data_;
+        dyn_arr(T* item, unsigned initial_size): size(initial_size), data(new T[initial_size]){
+            for (int i = 0; i < count; ++i) data[i] = item;
         }
+        dyn_arr(const dyn_arr& other) : size(other.size), data(new T[other.size]){
+            for (int i = 0; i < size; ++i) data[i] = other.data[i];
+        }
+        ~dyn_arr() {
+            delete[] data;
+        }
+
+        T& operator[](unsigned index){
+        if (index >= size) throw std::out_of_range("Index out of range");
+        return data[index];
+        }
+
+        T* begin(){return data;}
+
+        const T* begin()const {return data;}
+
+        T* end(){return data+size;}
+
+        const T* end()const {return data+size;}
 
         dyn_arr(const vector& ) = delete;
 
         dyn_arr& operator=(const vector&) = delete;
 
-        dyn_arr(dyn_arr&& other) noexcept : data_(other.data_), size_(other.size_) {
-            other.data_ = nullptr;
-            other.size_ = 0;
-        }
-        dyn_arr& operator=(r&& other) noexcept{
-            std::swap(data_, other.data_);
-            std::swap(size_, other.size_);
+        dyn_arr& operator=(dyn_arr other){
+            std::swap(data, other.data);
+            std::swap(size, other.size);
             return *this;
         }
 
-        T& operator[](unsigned index) {
-            if (index>=size_) throw std::out_of_range("Index out of range");
-            return data_[index];
-        }
+        T* data() { return data;}
 
-        const T& operator[](unsigned index) const {
-            if (index>=size_) throw std::out_of_range("Index out of range");
-            return data_[index];
-        }
-
-        T& back() {
-            if (size_ == 0) throw std::out_of_range("Vector is empty");
-            return data_[size_ - 1];
-        }
-
-        const T& back() const {
-            if (size_ == 0) throw std::out_of_range("Vector is empty");
-            return data_[size_ - 1];
-        }
+        const T* data() const { return data;}
         
-        [[nodiscard]] unsigned size() const { return size_;}
+        unsigned len() const { return size;}
 
-        T* data() { return data_; }
-
-        const T* data() const { return data_; }
-
-        const T* end() const { return data_ + size_; }
+        void resize(unsigned new_size) {
+            T* new_data = new T[new_size];
+            for (unsigned i = 0; i < new_size; ++i) {
+                new_data[i] = std::move(data_[i]);
+            }
+            delete[] data;
+            data = new_data;
+            size = new_size;
+        }
+        template <typename U> friend class array_sec;
 };

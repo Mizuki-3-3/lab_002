@@ -135,6 +135,7 @@ public:
         }
         return new_l;
     }
+
     
     ~s_list(){
         node<T>* current = head;
@@ -145,10 +146,10 @@ public:
         }
     }
 
-    [[nodiscard]] unsigned len() const { return size;}
+    unsigned len() const { return size;}
     T get_first() {
-    if (size == 0) throw std::out_of_range("list is empty");
-    return head->value;
+        if (size == 0) throw std::out_of_range("list is empty");
+        return head->value;
     }
 
     T get_last() {
@@ -157,8 +158,8 @@ public:
     }
 
     const T get_first() const {
-    if (size == 0) throw std::out_of_range("list is empty");
-    return head->value;
+        if (size == 0) throw std::out_of_range("list is empty");
+        return head->value;
     }
 
     const T get_last() const {
@@ -187,5 +188,6 @@ public:
         }
         return result;
     }
-    template <typename U> friend class list_sequence;
+    template <typename U> friend class m_list_sequence;
+    template <typename U> friend class im_list_sequence;
 };
