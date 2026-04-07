@@ -4,63 +4,66 @@
 #include <stdexcept>
 
 template <typename T>
-class im_list_sequence: public sequence<T>
+class immutable_list_seq: public sequence<T>
 {
 private:
     s_list<T>* list_s;
 public:
-    im_list_sequence() = default;
-    explicit im_list_sequence(const s_list<T>& other) : list_s(other) {}
-    explicit im_list_sequence(const std::initializer_list<T>& init) {
-        for (const auto& v : init) append(v);
+    immutable_list_seq() : list_s(new s_list<T>()) {}
+
+    explicit immutable_list_seq(const s_list<T>& other) : list_s(new s_list<T>(other)) {}
+
+    immutable_list_seq(const T* items, unsigned count) : list_s(new s_list<T>(items, count)) {}
+
+    immutable_list_seq(const immutable_list_seq& other) : list_s(new s_list<T>(*other.list_s)) {}
+
+    ~immutable_list_seq() { delete list_s; }
+
+    immutable_list_seq& operator=(const immutable_list_seq& other) {
+        if (this != &other) {
+            s_list<T>* new_list = new s_list<T>(*other.list_s);
+            delete list_s;
+            list_s = new_list;
+        }
+        return *this;
     }
 
-    s_list<T>*  append(const T& val) {
-        s_list<T>* new_l = new s_list<T>(*list_s);
+    immutable_list_seq<T>*  append(const T& val) {
+        immutable_list_seq<T>* new_l = new immutable_list_seq<T>(*list_s);
         node<T>* new_node = new node<T>(val);
-        if (new_l->size == 0) {
-            new_l->head = new_l->tail = new_node;
+        if (list_s->size == 0) {
+            new_l->list_s->head = new_l->list_s->tail = new_node;
         } else {
-            new_l->tail->next = new_node;
-            new_l->tail = new_node;
+            new_l->list_s->tail->next = new_node;
+            new_l->list_s->tail = new_node;
         }
-        ++new_l->size;
+        new_l->list_s->size++;
         return new_l;
     }
-    s_list<T>*  prepend(const T& val_for_new) {
-        s_list<T>* new_l = new s_list<T>(*list_s);
-        node<T>* new_node = new node<T>(val_for_new);
-        if (new_l->size == 0) {
-            new_l->head = new_l->tail = new_node;
+    immutable_list_seq<T>*  prepend(const T& val) {
+        immutable_list_seq<T>* new_l = new immutable_list_seq<T>(*list_s);
+        node<T>* new_node = new node<T>(val);
+        if (list_s->size == 0) {
+            new_l->list_s->head = new_l->list_s->tail = new_node;
         } else {
-            new_node->next = new_l->head;
-            new_l->head = new_node;
+            new_node->next = new_l->list_s->head;
+            new_l->list_s->head = new_node;
         }
-        ++new_l->size;
+        new_l->list_s->size++;
         return new_l;
     }
 
-    s_list<T>* insert(const T& val, unsigned index) {
+    immutable_list_seq<T>* insert(const T& val, unsigned index) {
         if (index > list_s->size) throw std::out_of_range("index out of range");
         if (index == 0) { return prepend(val); }
         if (index == list_s->size) { return append(val);  }
-        node<T>* cur = list_s->head;
-
-        for (unsigned i = 0; i < index - 1; ++i) cur = cur->next;
+        immutable_list_seq<T>* new_l = new immutable_list_seq<T>(*list_s);
+        node<T>* curr = new_l->list_s->head;
+        for (unsigned i = 0; i < index - 1; ++i) curr = curr->next;
         node<T>* new_node = new node<T>(val);
-        new_node->next = cur->next;
-        cur->next = new_node;
-        ++list_s->size;
+        new_node->next = curr->next;
+        curr->next = new_node;
+        new_l->list_s->size++;
         return new_l;
-    }
-    unsigned find(T wanted){
-        node<T>* current = list_s->head;
-        for (unsigned i = 0; i < list_s->size();i++){
-            if (current->value == wanted){
-                return i;
-            }
-            current = current->next;
-        }
-        throw std::out_of_range("not_found")
     }
 };

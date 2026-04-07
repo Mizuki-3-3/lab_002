@@ -4,13 +4,30 @@
 #include <stdexcept>
 
 template <typename T>
-class m_list_sequence: public sequence<T>
+class mutable_list_seq: public sequence<T>
 {
 private:
     s_list<T>* list_s;
 public:
-    m_list_sequence(): list_s(){}
-    explicit m_list_sequence(const s_list<T>& other) : list_s(other) {}
+    mutable_list_seq() : list_s(new s_list<T>()) {}
+
+    explicit mutable_list_seq(const s_list<T>& other) : list_s(new s_list<T>(other)) {}
+
+    mutable_list_seq(const T* items, unsigned count) : list_s(new s_list<T>(items, count)) {}
+
+    mutable_list_seq(const mutable_list_seq& other) : list_s(new s_list<T>(*other.list_s)) {}
+
+    ~mutable_list_seq() { delete list_s; }
+
+    mutable_list_seq& operator=(const mutable_list_seq& other) {
+        if (this != &other) {
+            s_list<T>* new_list = new s_list<T>(*other.list_s);
+            delete list_s;
+            list_s = new_list;
+        }
+        return *this;
+    }
+
     s_list<T>* append(const T& val) {
         node<T>* new_node = new node<T>(val);
         if (list_s->size == 0) {
@@ -56,6 +73,14 @@ public:
             current = current->next;
         }
         throw std::out_of_range("not_found")
+    }
+    s_list<T>* map(<T> (*func)(<T>)){
+        node<T>* current = list_s->head;
+        while (current){
+            current->value = *func(current->value)
+            current = current->next;
+        }
+        return list_s;
     }
 
 };

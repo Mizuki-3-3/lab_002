@@ -188,6 +188,6 @@ public:
         }
         return result;
     }
-    template <typename U> friend class m_list_sequence;
-    template <typename U> friend class im_list_sequence;
+    template <typename U> friend class mutable_list_seq;
+    template <typename U> friend class immutable_list_seq;
 };
