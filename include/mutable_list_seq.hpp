@@ -28,7 +28,7 @@ public:
         return *this;
     }
 
-    s_list<T>* append(const T& val) {
+    mutable_list_seq<T>* append(const T& val) {
         node<T>* new_node = new node<T>(val);
         if (list_s->size == 0) {
             list_s->head = list_s->tail = new_node;
@@ -37,9 +37,9 @@ public:
             list_s->tail = new_node;
         }
         ++list_s->size;
-        return list_s;
+        return this;
     }
-    s_list<T>*  prepend(const T& val_for_new) {
+    mutable_list_seq<T>*  prepend(const T& val_for_new) {
         node<T>* new_node = new node<T>(val_for_new);
         if (list_s->size == 0) {
             list_s->head = list_s->tail = new_node;
@@ -48,39 +48,19 @@ public:
             list_s->head = new_node;
         }
         ++list_s->size;
-        return list_s;
+        return this;
     }
 
-    s_list<T>* insert(const T& val, unsigned index) {
-        if (index > list_s->size) throw std::out_of_range("index out of range");
+    mutable_list_seq<T>* insert(const T& val, unsigned index) {
+        if (index >= list_s->size) throw std::out_of_range("index out of range");
         if (index == 0) { return prepend(val); }
-        if (index == list_s->size) { return append(val);}
+        if (index == list_s->size-1) { return append(val);}
         node<T>* cur = list_s->head;
         for (unsigned i = 0; i < index - 1; ++i) cur = cur->next;
         node<T>* new_node = new node<T>(val);
         new_node->next = cur->next;
         cur->next = new_node;
         ++list_s->size;
-        return list_s;
+        return this;
     }
-
-    unsigned find(T wanted){
-        node<T>* current = list_s->head;
-        for (unsigned i = 0; i < list_s->size();i++){
-            if (current->value == wanted){
-                return i;
-            }
-            current = current->next;
-        }
-        throw std::out_of_range("not_found")
-    }
-    s_list<T>* map(<T> (*func)(<T>)){
-        node<T>* current = list_s->head;
-        while (current){
-            current->value = *func(current->value)
-            current = current->next;
-        }
-        return list_s;
-    }
-
 };
