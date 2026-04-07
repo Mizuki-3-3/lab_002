@@ -45,7 +45,7 @@ public:
     };
     s_list () : head(nullptr), tail(nullptr), size(0){}
 
-    explicit s_list(unsigned int initial_size) : size(initial_size){
+    explicit s_list(unsigned initial_size) : size(initial_size){
         if (initial_size == 0) {
             head = nullptr;
             tail = nullptr;
