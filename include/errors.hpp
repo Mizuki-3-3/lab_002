@@ -1,4 +1,4 @@
-#pragma onse
+#pragma onсe
 #include <setjmp.h>
 
 typedef enum{
@@ -9,14 +9,14 @@ typedef enum{
     ERR_TYPE_MISMATCH,
 }errors;
 
-errors err_get();
-
 typedef struct {
     errors err;
     char* stack_files[10];
     int stack_lines[10];
     int stack_depth;
 }Exceptions;
+
+errors err_get();
 
 void print_err_and_stack(Exceptions* exc);
 
