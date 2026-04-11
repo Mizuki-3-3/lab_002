@@ -1,0 +1,224 @@
+#include "linked_list.hpp"
+#include "errors.hpp"
+#include <utility>
+
+template <typename T>
+node<T>::node(const T& value) : value(value), next(nullptr) {}
+
+template <typename T>
+s_list<T>::iterator::iterator(node<T>* ptr) : current(ptr) {}
+
+template <typename T>
+typename s_list<T>::iterator& s_list<T>::iterator::operator++() {
+    if (current) current = current->next;
+    return *this;
+}
+
+template <typename T>
+T& s_list<T>::iterator::operator*() { return current->value; }
+
+template <typename T>
+const T& s_list<T>::iterator::operator*() const { return current->value; }
+
+template <typename T>
+int s_list<T>::iterator::operator!=(const iterator& other) const {
+    return current != other.current;
+}
+
+template <typename T>
+int s_list<T>::iterator::operator==(const iterator& other) const {
+    return current == other.current;
+}
+
+template <typename T>
+s_list<T>::const_iterator::const_iterator(const node<T>* ptr) : current(ptr) {}
+
+template <typename T>
+typename s_list<T>::const_iterator& s_list<T>::const_iterator::operator++() {
+    if (current) current = current->next;
+    return *this;
+}
+
+template <typename T>
+const T& s_list<T>::const_iterator::operator*() const { return current->value; }
+
+template <typename T>
+int s_list<T>::const_iterator::operator!=(const const_iterator& other) const {
+    return current != other.current;
+}
+
+template <typename T>
+int s_list<T>::const_iterator::operator==(const const_iterator& other) const {
+    return current == other.current;
+}
+
+template <typename T>
+s_list<T>::s_list() : head(nullptr), tail(nullptr), size(0) {}
+
+template <typename T>
+s_list<T>::s_list(unsigned initial_size) : size(initial_size) {
+    if (initial_size == 0) {
+        head = tail = nullptr;
+        return;
+    }
+    head = new node<T>(T());
+    if (head == nullptr) THROW(ERR_MEMORY);
+    node<T>* current = head;
+    for (unsigned i = 1; i < initial_size; ++i) {
+        current->next = new node<T>(T());
+        if (current->next == nullptr) THROW(ERR_MEMORY);
+        current = current->next;
+    }
+    tail = current;
+    tail->next = nullptr;
+}
+
+template <typename T>
+s_list<T>::s_list(const T* data, unsigned initial_size) : size(initial_size) {
+    if (initial_size == 0) {
+        head = tail = nullptr;
+        return;
+    }
+    if (data == nullptr) THROW(ERR_NULL);
+    head = new node<T>(data[0]);
+    if (head == nullptr) THROW(ERR_MEMORY);
+    node<T>* current = head;
+    for (unsigned i = 1; i < initial_size; ++i) {
+        current->next = new node<T>(data[i]);
+        if (current->next == nullptr) THROW(ERR_MEMORY);
+        current = current->next;
+    }
+    tail = current;
+    tail->next = nullptr;
+}
+
+template <typename T>
+s_list<T>::s_list(const s_list& other) : size(other.size) {
+    if (other.head == nullptr) {
+        head = tail = nullptr;
+        return;
+    }
+    head = new node<T>(other.head->value);
+    if (head == nullptr) THROW(ERR_MEMORY);
+    node<T>* current = head;
+    node<T>* other_current = other.head->next;
+    while (other_current) {
+        current->next = new node<T>(other_current->value);
+        if (current->next == nullptr) THROW(ERR_MEMORY);
+        current = current->next;
+        other_current = other_current->next;
+    }
+    tail = current;
+    tail->next = nullptr;
+}
+
+template <typename T>
+T& s_list<T>::operator[](unsigned index) {
+    if (index >= size) THROW(ERR_INCORRECT_INDEX);
+    node<T>* current = head;
+    for (unsigned i = 0; i < index; ++i) current = current->next;
+    return current->value;
+}
+
+template <typename T>
+const T& s_list<T>::operator[](unsigned index) const {
+    if (index >= size) THROW(ERR_INCORRECT_INDEX);
+    node<T>* current = head;
+    for (unsigned i = 0; i < index; ++i) current = current->next;
+    return current->value;
+}
+
+template<typename T>
+s_list<T>& s_list<T>::operator=(s_list other){
+    std::swap(head, other.head);
+    std::swap(tail, other.tail);
+    std::swap(size, other.size);
+    return *this;
+}
+template <typename T>
+s_list<T> s_list<T>::operator+(const s_list& right) {
+    if (size == 0 && right.size == 0) return s_list();
+    s_list<T> new_l(size + right.size);
+    node<T>* current = new_l.head;
+    node<T>* old_current = head;
+    while (old_current) {
+        current->value = old_current->value;
+        current = current->next;
+        old_current = old_current->next;
+    }
+    old_current = right.head;
+    while (old_current) {
+        current->value = old_current->value;
+        current = current->next;
+        old_current = old_current->next;
+    }
+    return new_l;
+}
+
+template <typename T>
+s_list<T>::~s_list() {
+    node<T>* current = head;
+    while (current) {
+        node<T>* next = current->next;
+        delete current;
+        current = next;
+    }
+}
+
+template <typename T>
+unsigned s_list<T>::len() const { return size; }
+
+template <typename T>
+T s_list<T>::get_first() {
+    if (size == 0) THROW(ERR_INCORRECT_INDEX);
+    return head->value;
+}
+
+template <typename T>
+T s_list<T>::get_last() {
+    if (size == 0) THROW(ERR_INCORRECT_INDEX);
+    return tail->value;
+}
+
+template <typename T>
+const T s_list<T>::get_first() const {
+    if (size == 0) THROW(ERR_INCORRECT_INDEX);
+    return head->value;
+}
+
+template <typename T>
+const T s_list<T>::get_last() const {
+    if (size == 0) THROW(ERR_INCORRECT_INDEX);
+    return tail->value;
+}
+
+template <typename T>
+typename s_list<T>::iterator s_list<T>::begin() { return iterator(head); }
+
+template <typename T>
+typename s_list<T>::iterator s_list<T>::end() { return iterator(nullptr); }
+
+template <typename T>
+typename s_list<T>::const_iterator s_list<T>::begin() const {
+    return const_iterator(head);
+}
+
+template <typename T>
+typename s_list<T>::const_iterator s_list<T>::end() const {
+    return const_iterator(nullptr);
+}
+
+template <typename T>
+s_list<T> s_list<T>::slice(unsigned start, unsigned end) {
+    if (start > end || end > size) THROW(ERR_INCORRECT_INDEX);
+    s_list<T> result(end - start);
+    node<T>* cur = head;
+    node<T>* cur_r = result.head;
+    for (unsigned i = 0; i < start; ++i) cur = cur->next;
+    for (unsigned i = start; i < end; ++i) {
+        cur_r->value = cur->value;
+        cur_r = cur_r->next;
+        cur = cur->next;
+    }
+    return result;
+}
