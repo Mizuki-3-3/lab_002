@@ -107,11 +107,6 @@ typename dyn_arr<T>::iterator dyn_arr<T>::end() { return iterator(data + size); 
 template<typename T>
 typename dyn_arr<T>::const_iterator dyn_arr<T>::end() const { return const_iterator(data + size); }
 
-template<typename T>
-T* dyn_arr<T>::data() { return data; }
-
-template<typename T>
-const T* dyn_arr<T>::data() const { return data; }
 
 template<typename T>
 unsigned dyn_arr<T>::len() const { return size; }

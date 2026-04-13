@@ -1,10 +1,11 @@
 #pragma once
 
+#include "sequence.hpp"
 #include "linked_list.hpp"
 #include "Mutability.hpp"
 
 template<Mutability M, typename T>
-class list_seq {
+class list_seq : public sequence<T> {
 private:
     s_list<T>* list;
 
@@ -17,28 +18,36 @@ public:
 
     list_seq& operator=(const list_seq& other);
 
-    list_seq<M, T>* append(const T& val);
-    list_seq<M, T>* prepend(const T& val);
-    list_seq<M, T>* insert(const T& val, unsigned index);
+    T get_first() const override;
+    T get_last() const override;
+    T get(unsigned index) const override;
+    unsigned size() const override;
 
-    T& operator[](unsigned index);
-    const T& operator[](unsigned index) const;
+    sequence<T>* append(const T& item) override;
+    sequence<T>* prepend(const T& item) override;
+    sequence<T>* insert(const T& item, unsigned index) override;
+    sequence<T>* concat(sequence<T>* other) override;
+    sequence<T>* get_subsequence(unsigned start, unsigned end) const override;
+    unsigned find(const T& value) const override;
+
+    T& operator[](unsigned index) override;
+    const T& operator[](unsigned index) const override;
+
+    // Итераторы
+    auto begin() { return list->begin(); }
+    auto end()   { return list->end(); }
+    auto begin() const { return list->begin(); }
+    auto end()   const { return list->end(); }
+
+    // map, where, reduce
+    template <typename Func>
+    list_seq<M,T>* map(Func f);
 
     template <typename Func>
-    list_seq<M, T>* map(Func f);
+    list_seq<M,T>* where(Func f);
 
-    template <typename Func>
-    list_seq<M, T>* where(Func f);
-
-    template <typename Func>
-    auto reduce(Func f, const T& initial) const;
-
-    unsigned len() const;
-
-    auto begin();
-    auto end();
-    auto begin() const;
-    auto end() const;
+    template <typename Func, typename U>
+    U reduce(Func f, U initial) const;
 };
 
-#include "list_seq.cpp"
+#include "list_seq.tpp"

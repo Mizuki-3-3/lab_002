@@ -18,7 +18,7 @@ private:
 
 public:
     class iterator {
-        node<T>* current;
+        node<T>* curr;
     public:
         iterator(node<T>* ptr);
         iterator& operator++();
@@ -29,7 +29,7 @@ public:
     };
 
     class const_iterator {
-        const node<T>* current;
+        const node<T>* curr;
     public:
         const_iterator(const node<T>* ptr);
         const_iterator& operator++();
@@ -46,15 +46,12 @@ public:
 
     T& operator[](unsigned index);
     const T& operator[](unsigned index) const;
-
     s_list& operator=(s_list other);
     s_list operator+(const s_list& right);
 
     unsigned len() const;
-    T get_first();
-    T get_last();
-    const T get_first() const;
-    const T get_last() const;
+    T get_first() const;
+    T get_last() const;
 
     iterator begin();
     iterator end();
@@ -66,4 +63,4 @@ public:
     template<Mutability M, typename U> friend class list_seq;
 };
 
-#include "linked_list.cpp"
+#include "linked_list.tpp"

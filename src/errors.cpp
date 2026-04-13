@@ -7,22 +7,22 @@ jmp_buf buf;
 int exc_active = 0;
 Exceptions current = {};  
 
-char* err_get_message(errors err){
+const char* err_get_message(errors err){
     switch (err) {
         case ERR_NULL:
-            return"Нулевой указатель\n";
+            return "Нулевой указатель\n";
         case ERR_MEMORY:
-            return"Не удалось выделить память\n";
+            return "Не удалось выделить память\n";
         case ERR_INCORRECT_INDEX:
-            return"Неправильные размер матрицы\n";
+            return "Неправильные размер матрицы\n";
         case ERR_TYPE_MISMATCH:
-            return"Несовместимые типы\n";
+            return "Несовместимые типы\n";
         default:
-            return"Ошибка\n";
+            return "Ошибка\n";
     }
 }
 
-void err_set(errors err, char* file, int line){
+void err_set(errors err, const char* file, int line){
     current.err = err;
     if (current.stack_depth < 10) {
         current.stack_files[current.stack_depth] = file;

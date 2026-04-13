@@ -1,12 +1,14 @@
 #pragma once
 
+#include "sequence.hpp"
 #include "dyn_arr.hpp"
 #include "Mutability.hpp"
 
 template<Mutability M, typename T>
-class array_seq {
+class array_seq : public sequence<T> {
 private:
     dyn_arr<T>* arr;
+
 public:
     array_seq();
     explicit array_seq(const dyn_arr<T>& other);
@@ -16,27 +18,34 @@ public:
 
     array_seq& operator=(const array_seq& other);
 
-    array_seq<M, T>* append(const T val);
-    array_seq<M, T>* prepend(const T val);
-    array_seq<M, T>* insert(const T val, unsigned index);
+    T get_first() const override;
+    T get_last() const override;
+    T get(unsigned index) const override;
+    unsigned size() const override;
+
+    sequence<T>* append(const T& item) override;
+    sequence<T>* prepend(const T& item) override;
+    sequence<T>* insert(const T& item, unsigned index) override;
+    sequence<T>* concat(sequence<T>* other) override;
+    sequence<T>* get_subsequence(unsigned start, unsigned end) const override;
+    unsigned find(const T& value) const override;
+
+    T& operator[](unsigned index) override;
+    const T& operator[](unsigned index) const override;
+
+    auto begin() { return arr->begin(); }
+    auto end()   { return arr->end(); }
+    auto begin() const { return arr->begin(); }
+    auto end()   const { return arr->end(); }
 
     template <typename Func>
-    array_seq<M, T>* map(Func f);
+    array_seq<M,T>* map(Func f);
 
     template <typename Func>
-    array_seq<M, T>* where(Func f);
+    array_seq<M,T>* where(Func f);
 
-    template <typename Func>
-    auto reduce(Func f, T first) const;
-
-    unsigned size() const;
-    T& operator[](unsigned index);
-    const T& operator[](unsigned index) const;
-
-    auto begin();
-    auto end();
-    auto begin() const;
-    auto end() const;
+    template <typename Func, typename U>
+    U reduce(Func f, U initial) const;
 };
 
-#include "array_seq.cpp"
+#include "array_seq.tpp"

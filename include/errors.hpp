@@ -1,4 +1,4 @@
-#pragma onсe
+#pragma once
 #include <setjmp.h>
 
 typedef enum{
@@ -11,7 +11,7 @@ typedef enum{
 
 typedef struct {
     errors err;
-    char* stack_files[10];
+    const char* stack_files[10];
     int stack_lines[10];
     int stack_depth;
 }Exceptions;
@@ -20,11 +20,11 @@ errors err_get();
 
 void print_err_and_stack(Exceptions* exc);
 
-char* err_get_message(errors err);
+const char* err_get_message(errors err);
 
 void err_clear();
 
-void err_set(errors err, char* file, int line);
+void err_set(errors err, const char* file, int line);
 
 extern jmp_buf buf;
 extern int exc_active;

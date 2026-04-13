@@ -6,50 +6,50 @@ template <typename T>
 node<T>::node(const T& value) : value(value), next(nullptr) {}
 
 template <typename T>
-s_list<T>::iterator::iterator(node<T>* ptr) : current(ptr) {}
+s_list<T>::iterator::iterator(node<T>* ptr) : curr(ptr) {}
 
 template <typename T>
 typename s_list<T>::iterator& s_list<T>::iterator::operator++() {
-    if (current) current = current->next;
+    if (curr) curr = curr->next;
     return *this;
 }
 
 template <typename T>
-T& s_list<T>::iterator::operator*() { return current->value; }
+T& s_list<T>::iterator::operator*() { return curr->value; }
 
 template <typename T>
-const T& s_list<T>::iterator::operator*() const { return current->value; }
+const T& s_list<T>::iterator::operator*() const { return curr->value; }
 
 template <typename T>
 int s_list<T>::iterator::operator!=(const iterator& other) const {
-    return current != other.current;
+    return curr != other.curr;
 }
 
 template <typename T>
 int s_list<T>::iterator::operator==(const iterator& other) const {
-    return current == other.current;
+    return curr == other.curr;
 }
 
 template <typename T>
-s_list<T>::const_iterator::const_iterator(const node<T>* ptr) : current(ptr) {}
+s_list<T>::const_iterator::const_iterator(const node<T>* ptr) : curr(ptr) {}
 
 template <typename T>
 typename s_list<T>::const_iterator& s_list<T>::const_iterator::operator++() {
-    if (current) current = current->next;
+    if (curr) curr = curr->next;
     return *this;
 }
 
 template <typename T>
-const T& s_list<T>::const_iterator::operator*() const { return current->value; }
+const T& s_list<T>::const_iterator::operator*() const { return curr->value; }
 
 template <typename T>
 int s_list<T>::const_iterator::operator!=(const const_iterator& other) const {
-    return current != other.current;
+    return curr != other.curr;
 }
 
 template <typename T>
 int s_list<T>::const_iterator::operator==(const const_iterator& other) const {
-    return current == other.current;
+    return curr == other.curr;
 }
 
 template <typename T>
@@ -63,13 +63,13 @@ s_list<T>::s_list(unsigned initial_size) : size(initial_size) {
     }
     head = new node<T>(T());
     if (head == nullptr) THROW(ERR_MEMORY);
-    node<T>* current = head;
+    node<T>* curr = head;
     for (unsigned i = 1; i < initial_size; ++i) {
-        current->next = new node<T>(T());
-        if (current->next == nullptr) THROW(ERR_MEMORY);
-        current = current->next;
+        curr->next = new node<T>(T());
+        if (curr->next == nullptr) THROW(ERR_MEMORY);
+        curr = curr->next;
     }
-    tail = current;
+    tail = curr;
     tail->next = nullptr;
 }
 
@@ -82,13 +82,13 @@ s_list<T>::s_list(const T* data, unsigned initial_size) : size(initial_size) {
     if (data == nullptr) THROW(ERR_NULL);
     head = new node<T>(data[0]);
     if (head == nullptr) THROW(ERR_MEMORY);
-    node<T>* current = head;
+    node<T>* curr = head;
     for (unsigned i = 1; i < initial_size; ++i) {
-        current->next = new node<T>(data[i]);
-        if (current->next == nullptr) THROW(ERR_MEMORY);
-        current = current->next;
+        curr->next = new node<T>(data[i]);
+        if (curr->next == nullptr) THROW(ERR_MEMORY);
+        curr = curr->next;
     }
-    tail = current;
+    tail = curr;
     tail->next = nullptr;
 }
 
@@ -100,32 +100,42 @@ s_list<T>::s_list(const s_list& other) : size(other.size) {
     }
     head = new node<T>(other.head->value);
     if (head == nullptr) THROW(ERR_MEMORY);
-    node<T>* current = head;
+    node<T>* curr = head;
     node<T>* other_current = other.head->next;
     while (other_current) {
-        current->next = new node<T>(other_current->value);
-        if (current->next == nullptr) THROW(ERR_MEMORY);
-        current = current->next;
+        curr->next = new node<T>(other_current->value);
+        if (curr->next == nullptr) THROW(ERR_MEMORY);
+        curr = curr->next;
         other_current = other_current->next;
     }
-    tail = current;
+    tail = curr;
     tail->next = nullptr;
+}
+
+template <typename T>
+s_list<T>::~s_list() {
+    node<T>* curr = head;
+    while (curr) {
+        node<T>* next = curr->next;
+        delete curr;
+        curr = next;
+    }
 }
 
 template <typename T>
 T& s_list<T>::operator[](unsigned index) {
     if (index >= size) THROW(ERR_INCORRECT_INDEX);
-    node<T>* current = head;
-    for (unsigned i = 0; i < index; ++i) current = current->next;
-    return current->value;
+    node<T>* curr = head;
+    for (unsigned i = 0; i < index; ++i) curr = curr->next;
+    return curr->value;
 }
 
 template <typename T>
 const T& s_list<T>::operator[](unsigned index) const {
     if (index >= size) THROW(ERR_INCORRECT_INDEX);
-    node<T>* current = head;
-    for (unsigned i = 0; i < index; ++i) current = current->next;
-    return current->value;
+    node<T>* curr = head;
+    for (unsigned i = 0; i < index; ++i) curr = curr->next;
+    return curr->value;
 }
 
 template<typename T>
@@ -139,55 +149,33 @@ template <typename T>
 s_list<T> s_list<T>::operator+(const s_list& right) {
     if (size == 0 && right.size == 0) return s_list();
     s_list<T> new_l(size + right.size);
-    node<T>* current = new_l.head;
+    node<T>* curr = new_l.head;
     node<T>* old_current = head;
     while (old_current) {
-        current->value = old_current->value;
-        current = current->next;
+        curr->value = old_current->value;
+        curr = curr->next;
         old_current = old_current->next;
     }
     old_current = right.head;
     while (old_current) {
-        current->value = old_current->value;
-        current = current->next;
+        curr->value = old_current->value;
+        curr = curr->next;
         old_current = old_current->next;
     }
     return new_l;
 }
 
 template <typename T>
-s_list<T>::~s_list() {
-    node<T>* current = head;
-    while (current) {
-        node<T>* next = current->next;
-        delete current;
-        current = next;
-    }
-}
-
-template <typename T>
 unsigned s_list<T>::len() const { return size; }
 
 template <typename T>
-T s_list<T>::get_first() {
+T s_list<T>::get_first() const {
     if (size == 0) THROW(ERR_INCORRECT_INDEX);
     return head->value;
 }
 
 template <typename T>
-T s_list<T>::get_last() {
-    if (size == 0) THROW(ERR_INCORRECT_INDEX);
-    return tail->value;
-}
-
-template <typename T>
-const T s_list<T>::get_first() const {
-    if (size == 0) THROW(ERR_INCORRECT_INDEX);
-    return head->value;
-}
-
-template <typename T>
-const T s_list<T>::get_last() const {
+T s_list<T>::get_last() const {
     if (size == 0) THROW(ERR_INCORRECT_INDEX);
     return tail->value;
 }

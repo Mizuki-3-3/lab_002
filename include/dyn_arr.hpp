@@ -48,12 +48,10 @@ public:
     dyn_arr& operator=(const dyn_arr&) = delete;
     dyn_arr& operator=(dyn_arr other);
 
-    T* data();
-    const T* data() const;
-    unsigned len() const;          // теперь const
+    unsigned len() const; 
     void resize(unsigned new_size);
 
     template<Mutability M, typename U> friend class array_seq;
 };
 
-#include "dyn_arr.cpp"
+#include "dyn_arr.tpp"
