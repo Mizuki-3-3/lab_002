@@ -11,16 +11,16 @@ private:
 
 public:
     array_seq();
-    explicit array_seq(const dyn_arr<T>& other);
+    explicit array_seq(unsigned initial_size);
     array_seq(const T* items, unsigned count);
     array_seq(const array_seq& other);
+    array_seq(const dyn_arr<T>& other);
     ~array_seq();
 
     array_seq& operator=(const array_seq& other);
 
     T get_first() const override;
     T get_last() const override;
-    T get(unsigned index) const override;
     unsigned size() const override;
 
     sequence<T>* append(const T& item) override;
@@ -46,6 +46,9 @@ public:
 
     template <typename Func, typename U>
     U reduce(Func f, U initial) const;
+
+    using iterator = typename dyn_arr<T>::iterator;
+    using const_iterator = typename dyn_arr<T>::const_iterator;
 };
 
 #include "array_seq.tpp"

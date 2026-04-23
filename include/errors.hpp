@@ -1,94 +1,40 @@
 #pragma once
-#include <setjmp.h>
 
-typedef enum{
+#include <exception>
+#include <cstdio>
+
+enum errors {
     NO_ERR = 0,
     ERR_NULL,
     ERR_MEMORY,
     ERR_INCORRECT_INDEX,
     ERR_TYPE_MISMATCH,
-}errors;
+};
 
-typedef struct {
-    errors err;
+class exception_ : public std::exception {
+private:
+    errors err_code;
     const char* stack_files[10];
     int stack_lines[10];
     int stack_depth;
-}Exceptions;
+    mutable char what_buf[256];
 
-errors err_get();
-
-void print_err_and_stack(Exceptions* exc);
+public:
+    exception_(errors code, const char* file, int line) noexcept;
+    void add_context(const char* file, int line) noexcept;
+    errors get_code() const noexcept;
+    const char* what() const noexcept override;
+    void print_stack(FILE* out = stderr) const;
+};
 
 const char* err_get_message(errors err);
 
-void err_clear();
+#define TRY try {
+#define CATCH(err_var) } catch (const exception_& e) { err_var = e.get_code();
+#define CATCH_TESTS } catch (const exception_&) {
+#define ETRY }
+#define THROW(err_code) do { throw exception_(err_code, __FILE__, __LINE__); } while(0)
+#define RETURN_ON_ERROR(cond, err_code) do { if (cond) { THROW(err_code); return; } } while(0)
+#define RETURN_VAL_ON_ERROR(cond, err_code, ret) do { if (cond) { THROW(err_code); return ret; } } while(0)
 
-void err_set(errors err, const char* file, int line);
-
-extern jmp_buf buf;
-extern int exc_active;
-extern Exceptions current;
-
-#define TRY \
-    do { \
-        exc_active = 1; \
-        current.stack_depth = 0; \
-        switch (setjmp(buf)) { \
-            case 0:
-    
-
-#define CATCH(err_var) \
-            break; \
-            default: \
-                err_var = current.err; \
-                exc_active = 0;
-    
-#define CATCH_TESTS \
-            break; \
-            default: \
-                exc_active = 0;
-
-#define ETRY \
-        } \
-    } while (0)
-
-#define THROW(err_code) \
-    do { \
-        current.err = err_code; \
-        if (current.stack_depth < 10) { \
-            current.stack_files[current.stack_depth] = __FILE__; \
-            current.stack_lines[current.stack_depth] = __LINE__; \
-            current.stack_depth++; \
-        } \
-        if (exc_active == 1) { \
-            longjmp(buf, 1); \
-        } else { \
-            print_err_and_stack(&current); \
-        } \
-    } while (0)
-    
-
-/**
- * @brief Макрос для возврата из void функции при возникновении ошибки
- * 
- */
-#define RETURN_ON_ERROR(cond, err_code) \
-    do { \
-        if (cond) { \
-            THROW(err_code); \
-            return; \
-        } \
-    } while (0)
-
-/**
- * @brief Макрос для возврата значения из функции при возникновении ошибки
- * 
- */
-#define RETURN_VAL_ON_ERROR(cond, err_code, ret) \
-    do { \
-        if (cond) { \
-            THROW(err_code); \
-            return ret; \
-        } \
-    } while (0)
+#include "errors.tpp" 

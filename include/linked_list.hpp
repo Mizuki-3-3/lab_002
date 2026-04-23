@@ -14,7 +14,7 @@ class s_list {
 private:
     node<T>* head;
     node<T>* tail;
-    unsigned size;
+    unsigned length;
 
 public:
     class iterator {
@@ -49,7 +49,7 @@ public:
     s_list& operator=(s_list other);
     s_list operator+(const s_list& right);
 
-    unsigned len() const;
+    unsigned size() const;
     T get_first() const;
     T get_last() const;
 
@@ -60,7 +60,6 @@ public:
 
     s_list<T> slice(unsigned start, unsigned end);
 
-    template<Mutability M, typename U> friend class list_seq;
 };
 
 #include "linked_list.tpp"

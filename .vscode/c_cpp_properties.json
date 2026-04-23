@@ -3,9 +3,9 @@
         {
             "name": "Win32",
             "includePath": [
-                "C:\\FTXUI-main\\build\\Release",
+                "C:\\FTXUI\\include",
                 "C:\\labs\\2_сем\\lab_002\\include",
-                "C:\\labs\\2_сем\\lab_002\\src"
+                "C:\\labs\\2_сем\\lab_002\\templates"
             ],
             "defines": [
                 "_DEBUG",

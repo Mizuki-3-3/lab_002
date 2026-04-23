@@ -7,7 +7,6 @@ public:
 
     virtual T get_first() const = 0;
     virtual T get_last() const = 0;
-    virtual T get(unsigned index) const = 0;
     virtual unsigned size() const = 0;
 
     virtual sequence<T>* append(const T& item) = 0;

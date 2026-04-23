@@ -1,6 +1,5 @@
 #include "linked_list.hpp"
 #include "errors.hpp"
-#include <utility>
 
 template <typename T>
 node<T>::node(const T& value) : value(value), next(nullptr) {}
@@ -53,10 +52,10 @@ int s_list<T>::const_iterator::operator==(const const_iterator& other) const {
 }
 
 template <typename T>
-s_list<T>::s_list() : head(nullptr), tail(nullptr), size(0) {}
+s_list<T>::s_list() : head(nullptr), tail(nullptr), length(0) {}
 
 template <typename T>
-s_list<T>::s_list(unsigned initial_size) : size(initial_size) {
+s_list<T>::s_list(unsigned initial_size) : length(initial_size) {
     if (initial_size == 0) {
         head = tail = nullptr;
         return;
@@ -74,7 +73,7 @@ s_list<T>::s_list(unsigned initial_size) : size(initial_size) {
 }
 
 template <typename T>
-s_list<T>::s_list(const T* data, unsigned initial_size) : size(initial_size) {
+s_list<T>::s_list(const T* data, unsigned initial_size) : length(initial_size) {
     if (initial_size == 0) {
         head = tail = nullptr;
         return;
@@ -93,7 +92,7 @@ s_list<T>::s_list(const T* data, unsigned initial_size) : size(initial_size) {
 }
 
 template <typename T>
-s_list<T>::s_list(const s_list& other) : size(other.size) {
+s_list<T>::s_list(const s_list& other) : length(other.length) {
     if (other.head == nullptr) {
         head = tail = nullptr;
         return;
@@ -124,7 +123,7 @@ s_list<T>::~s_list() {
 
 template <typename T>
 T& s_list<T>::operator[](unsigned index) {
-    if (index >= size) THROW(ERR_INCORRECT_INDEX);
+    if (index >= length) THROW(ERR_INCORRECT_INDEX);
     node<T>* curr = head;
     for (unsigned i = 0; i < index; ++i) curr = curr->next;
     return curr->value;
@@ -132,7 +131,7 @@ T& s_list<T>::operator[](unsigned index) {
 
 template <typename T>
 const T& s_list<T>::operator[](unsigned index) const {
-    if (index >= size) THROW(ERR_INCORRECT_INDEX);
+    if (index >= length) THROW(ERR_INCORRECT_INDEX);
     node<T>* curr = head;
     for (unsigned i = 0; i < index; ++i) curr = curr->next;
     return curr->value;
@@ -142,13 +141,13 @@ template<typename T>
 s_list<T>& s_list<T>::operator=(s_list other){
     std::swap(head, other.head);
     std::swap(tail, other.tail);
-    std::swap(size, other.size);
+    std::swap(length, other.length);
     return *this;
 }
 template <typename T>
 s_list<T> s_list<T>::operator+(const s_list& right) {
-    if (size == 0 && right.size == 0) return s_list();
-    s_list<T> new_l(size + right.size);
+    if (length == 0 && right.length == 0) return s_list();
+    s_list<T> new_l(length + right.length);
     node<T>* curr = new_l.head;
     node<T>* old_current = head;
     while (old_current) {
@@ -166,17 +165,17 @@ s_list<T> s_list<T>::operator+(const s_list& right) {
 }
 
 template <typename T>
-unsigned s_list<T>::len() const { return size; }
+unsigned s_list<T>::size() const { return length; }
 
 template <typename T>
 T s_list<T>::get_first() const {
-    if (size == 0) THROW(ERR_INCORRECT_INDEX);
+    if (length == 0) THROW(ERR_INCORRECT_INDEX);
     return head->value;
 }
 
 template <typename T>
 T s_list<T>::get_last() const {
-    if (size == 0) THROW(ERR_INCORRECT_INDEX);
+    if (length == 0) THROW(ERR_INCORRECT_INDEX);
     return tail->value;
 }
 
@@ -198,7 +197,7 @@ typename s_list<T>::const_iterator s_list<T>::end() const {
 
 template <typename T>
 s_list<T> s_list<T>::slice(unsigned start, unsigned end) {
-    if (start > end || end > size) THROW(ERR_INCORRECT_INDEX);
+    if (start > end || end > length) THROW(ERR_INCORRECT_INDEX);
     s_list<T> result(end - start);
     node<T>* cur = head;
     node<T>* cur_r = result.head;

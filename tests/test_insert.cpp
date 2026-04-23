@@ -3,6 +3,302 @@
 #include "assertions.hpp"
 #include "tests.hpp"
 
+TEST(insert_mutable_array_nonempty_begin) {
+    int init[] = {1, 2, 3};
+    array_seq<Mutability::Mutable, int>* seq = new array_seq<Mutability::Mutable, int>(init, 3);
+    seq->insert(26, 0);
+    assert(seq->size() == 4);
+    assert(seq->get_first() == 26);
+    delete seq;
+}
+
+TEST(insert_immmutable_array_nonempty_begin) {
+    int init[] = {1, 2, 3};
+    array_seq<Mutability::Immutable, int>* seq = new array_seq<Mutability::Immutable, int>(init, 3);
+    sequence<int>* new_seq = new  array_seq<Mutability::Immutable, int>();
+    new_seq = seq->insert(4, 0);
+    assert(seq->size() == 3);
+    assert(new_seq->size() == 4);
+    assert(new_seq->get_first() == 4);
+    delete seq;
+    delete new_seq;
+}
+
+TEST(insert_mutable_list_nonempty_begin){
+    int init[] = {1, 2, 3};
+    list_seq<Mutability::Mutable, int>* seq = new list_seq<Mutability::Mutable, int>(init, 3);
+    seq->insert(26, 0);
+    assert(seq->size() == 4);
+    assert(seq->get_first() == 26);
+    delete seq;
+}
+
+TEST(insert_immmutable_list_nonempty_begin){
+    int init[] = {1, 2, 3};
+    list_seq<Mutability::Immutable, int>* seq = new list_seq<Mutability::Immutable, int>(init, 3);
+    sequence<int>* new_seq = new list_seq<Mutability::Immutable, int>();
+    new_seq = seq->insert(26, 0);
+    assert(seq->size()==3);
+    assert(new_seq->size() == 4);
+    assert(new_seq->get_first() == 26);
+    delete seq;
+    delete new_seq;
+}
+
+TEST(insert_mutable_array_empty) {
+    array_seq<Mutability::Mutable, int>* seq = new array_seq<Mutability::Mutable, int>();
+    seq->insert(26, 0);
+    assert(seq->size() == 1);
+    assert(seq->get_first() == 26);
+    assert(seq->get_last() == 26);
+    delete seq;
+}
+
+TEST(insert_immmutable_array_empty) {
+    array_seq<Mutability::Immutable, int>* seq = new array_seq<Mutability::Immutable, int>();
+    sequence<int>* new_seq = new  array_seq<Mutability::Immutable, int>();
+    new_seq = seq->insert(26, 0);
+    assert(seq->size() == 0);
+    assert(new_seq->size() == 1);
+    assert(new_seq->get_first() == 26);
+    assert(new_seq->get_last() == 26);
+    delete seq;
+    delete new_seq;
+}
+
+TEST(insert_mutable_list_empty){
+    list_seq<Mutability::Mutable, int>* seq = new list_seq<Mutability::Mutable, int>();
+    seq->insert(26, 0);
+    assert(seq->size() == 1);
+    assert(seq->get_first() == 26);
+    assert(seq->get_last() == 26);
+    delete seq;
+}
+
+TEST(insert_immmutable_list_empty){
+    list_seq<Mutability::Immutable, int>* seq = new list_seq<Mutability::Immutable, int>();
+    sequence<int>* new_seq = new list_seq<Mutability::Immutable, int>();
+    new_seq = seq->insert(26, 0);
+    assert(seq->size()==0);
+    assert(new_seq->size() == 1);
+    assert(new_seq->get_first() == 26);
+    assert(new_seq->get_last() == 26);
+    delete seq;
+    delete new_seq;
+}
+
+TEST(insert_mutable_array_nonempty_2_index) {
+    int init[] = {1, 2, 3};
+    array_seq<Mutability::Mutable, int>* seq = new array_seq<Mutability::Mutable, int>(init, 3);
+    seq->insert(26, 2);
+    assert(seq->size() == 4);
+    assert((*seq)[2] == 26);
+    delete seq;
+}
+
+TEST(insert_immmutable_array_nonempty_2_index) {
+    int init[] = {1, 2, 3};
+    array_seq<Mutability::Immutable, int>* seq = new array_seq<Mutability::Immutable, int>(init, 3);
+    sequence<int>* new_seq = new  array_seq<Mutability::Immutable, int>();
+    new_seq = seq->insert(26, 2);
+    assert(seq->size() == 3);
+    assert(new_seq->size() == 4);
+    assert((*new_seq)[2] == 26);
+    delete seq;
+    delete new_seq;
+}
+
+TEST(insert_mutable_list_nonempty_2_index){
+    int init[] = {1, 2, 3};
+    list_seq<Mutability::Mutable, int>* seq = new list_seq<Mutability::Mutable, int>(init, 3);
+    seq->insert(26, 2);
+    assert(seq->size() == 4);
+    assert((*seq)[2] == 26);
+    delete seq;
+}
+
+TEST(insert_immmutable_list_nonempty_2_index){
+    int init[] = {1, 2, 3};
+    list_seq<Mutability::Immutable, int>* seq = new list_seq<Mutability::Immutable, int>(init, 3);
+    sequence<int>* new_seq = new list_seq<Mutability::Immutable, int>();
+    new_seq = seq->insert(26, 2);
+    assert(seq->size()==3);
+    assert(new_seq->size() == 4);
+    assert((*new_seq)[2] == 26);
+    delete seq;
+    delete new_seq;
+}
+
+TEST(insert_mutable_array_nonempty_size_index) {
+    int init[] = {1, 2, 3};
+    array_seq<Mutability::Mutable, int>* seq = new array_seq<Mutability::Mutable, int>(init, 3);
+    seq->insert(26, seq->size());
+    assert(seq->size() == 4);
+    assert((*seq)[(seq->size()-1)] == 26);
+    delete seq;
+}
+
+TEST(insert_immmutable_array_nonempty_size_index) {
+    int init[] = {1, 2, 3};
+    array_seq<Mutability::Immutable, int>* seq = new array_seq<Mutability::Immutable, int>(init, 3);
+    sequence<int>* new_seq = new  array_seq<Mutability::Immutable, int>();
+    new_seq = seq->insert(26, seq->size());
+    assert(seq->size() == 3);
+    assert(new_seq->size() == 4);
+    assert((*new_seq)[seq->size()] == 26);
+    delete seq;
+    delete new_seq;
+}
+
+TEST(insert_mutable_list_nonempty_size_index){
+    int init[] = {1, 2, 3};
+    list_seq<Mutability::Mutable, int>* seq = new list_seq<Mutability::Mutable, int>(init, 3);
+    seq->insert(26, seq->size());
+    assert(seq->size() == 4);
+    assert((*seq)[(seq->size()-1)] == 26);
+    delete seq;
+}
+
+TEST(insert_immmutable_list_nonempty_size_index){
+    int init[] = {1, 2, 3};
+    list_seq<Mutability::Immutable, int>* seq = new list_seq<Mutability::Immutable, int>(init, 3);
+    sequence<int>* new_seq = new list_seq<Mutability::Immutable, int>();
+    new_seq = seq->insert(26, seq->size());
+    assert(seq->size()==3);
+    assert(new_seq->size() == 4);
+    assert((*new_seq)[seq->size()] == 26);
+    delete seq;
+    delete new_seq;
+}
+
+TEST(insert_immmutable_list_incorrect_index_test){
+    list_seq<Mutability::Immutable, int>* seq = new list_seq<Mutability::Immutable, int>();
+    sequence<int>* new_seq = new list_seq<Mutability::Immutable, int>();
+    errors err = NO_ERR;
+    TRY{
+        new_seq = seq->insert(2947, 1);
+    }
+    CATCH(err) {
+        assert(err == ERR_INCORRECT_INDEX);
+    }
+    ETRY;
+    assert(seq->size() == 0);
+    
+    delete new_seq;
+    delete seq;
+}
+
+TEST(insert_mmutable_list_incorrect_index_test){
+    list_seq<Mutability::Immutable, int>* seq = new list_seq<Mutability::Immutable, int>();
+    errors err = NO_ERR;
+    TRY{
+        seq->insert(2947, 1);
+    }
+    CATCH(err) {
+        assert(err == ERR_INCORRECT_INDEX);
+    }
+    ETRY;
+    assert(seq->size() == 0);
+    
+    delete seq;
+}
+
+TEST(insert_immmutable_array_incorrect_index_test){
+    array_seq<Mutability::Immutable, int>* seq = new array_seq<Mutability::Immutable, int>();
+    sequence<int>* new_seq = new list_seq<Mutability::Immutable, int>();
+    errors err = NO_ERR;
+    TRY{
+        new_seq = seq->insert(2947, 1);
+    }
+    CATCH(err) {
+        assert(err == ERR_INCORRECT_INDEX);
+    }
+    ETRY;
+    assert(seq->size() == 0);
+    
+    delete new_seq;
+    delete seq;
+}
+
+TEST(insert_mmutable_array_incorrect_index_test){
+    array_seq<Mutability::Immutable, int>* seq = new array_seq<Mutability::Immutable, int>();
+    errors err = NO_ERR;
+    TRY{
+        seq->insert(2947, 1);
+    }
+    CATCH(err) {
+        assert(err == ERR_INCORRECT_INDEX);
+    }
+    ETRY;
+    assert(seq->size() == 0);
+    delete seq;
+}
+
+TEST(insert_immmutable_list_negative_index_test){
+    list_seq<Mutability::Immutable, int>* seq = new list_seq<Mutability::Immutable, int>();
+    sequence<int>* new_seq = new list_seq<Mutability::Immutable, int>();
+    errors err = NO_ERR;
+    TRY{
+        new_seq = seq->insert(2947, -1231);
+    }
+    CATCH(err) {
+        assert(err == ERR_INCORRECT_INDEX);
+    }
+    ETRY;
+    assert(seq->size() == 0);
+    
+    delete new_seq;
+    delete seq;
+}
+
+TEST(insert_mmutable_list_negative_index_test){
+    list_seq<Mutability::Immutable, int>* seq = new list_seq<Mutability::Immutable, int>();
+    errors err = NO_ERR;
+    TRY{
+        seq->insert(2947, -21);
+    }
+    CATCH(err) {
+        assert(err == ERR_INCORRECT_INDEX);
+    }
+    ETRY;
+    assert(seq->size() == 0);
+    
+    delete seq;
+}
+
+TEST(insert_immmutable_array_negative_index_test){
+    array_seq<Mutability::Immutable, int>* seq = new array_seq<Mutability::Immutable, int>();
+    sequence<int>* new_seq = new list_seq<Mutability::Immutable, int>();
+    errors err = NO_ERR;
+    TRY{
+        new_seq = seq->insert(2947, -23);
+    }
+    CATCH(err) {
+        assert(err == ERR_INCORRECT_INDEX);
+    }
+    ETRY;
+    assert(seq->size() == 0);
+    
+    delete new_seq;
+    delete seq;
+}
+
+TEST(insert_mmutable_array_negative_index_test){
+    array_seq<Mutability::Immutable, int>* seq = new array_seq<Mutability::Immutable, int>();
+    errors err = NO_ERR;
+    TRY{
+        seq->insert(2947, -24);
+    }
+    CATCH(err) {
+        assert(err == ERR_INCORRECT_INDEX);
+    }
+    ETRY;
+    assert(seq->size() == 0);
+    
+    delete seq;
+}
+
+
 TEST(insert_mutable_array_middle) {
     int init[] = {1, 2, 3};
     array_seq<Mutability::Mutable, int>* seq = new array_seq<Mutability::Mutable, int>(init, 3);
@@ -20,8 +316,8 @@ TEST(insert_immutable_list_begin) {
     assert(seq->get_first() == 5);
     assert(new_seq->size() == 3);
     assert(new_seq->get_first() == 0);
-    assert(new_seq->get(1) == 5);
-    assert(new_seq->get(2) == 6);
+    assert((*new_seq)[1] == 5);
+    assert((*new_seq)[2] == 6);
     delete seq;
     delete new_seq;
 }

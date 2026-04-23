@@ -20,7 +20,6 @@ public:
 
     T get_first() const override;
     T get_last() const override;
-    T get(unsigned index) const override;
     unsigned size() const override;
 
     sequence<T>* append(const T& item) override;
@@ -33,13 +32,11 @@ public:
     T& operator[](unsigned index) override;
     const T& operator[](unsigned index) const override;
 
-    // Итераторы
     auto begin() { return list->begin(); }
     auto end()   { return list->end(); }
     auto begin() const { return list->begin(); }
     auto end()   const { return list->end(); }
 
-    // map, where, reduce
     template <typename Func>
     list_seq<M,T>* map(Func f);
 

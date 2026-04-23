@@ -6,7 +6,7 @@ template<typename T>
 class dyn_arr {
 private:
     T* data;
-    unsigned size;
+    unsigned length;
 public:
     class iterator {
         T* current;
@@ -19,21 +19,21 @@ public:
         int operator!=(iterator& other) const;
         int operator==(iterator& other) const;
     };
-
+    
     class const_iterator {
         const T* current;
     public:
         const_iterator(const T* ptr);
         const_iterator& operator++();
         const_iterator operator++(int);
-        const T& operator*() const;   // const в конце
+        const T& operator*() const;
         int operator!=(const const_iterator& other) const;
         int operator==(const const_iterator& other) const;
     };
 
     dyn_arr();
     explicit dyn_arr(unsigned initial_size);
-    dyn_arr(const T* items, unsigned initial_size);   // теперь const T*
+    dyn_arr(const T* items, unsigned initial_size);
     dyn_arr(const dyn_arr& other);
     ~dyn_arr();
 
@@ -48,10 +48,9 @@ public:
     dyn_arr& operator=(const dyn_arr&) = delete;
     dyn_arr& operator=(dyn_arr other);
 
-    unsigned len() const; 
+    unsigned size() const; 
     void resize(unsigned new_size);
 
-    template<Mutability M, typename U> friend class array_seq;
 };
 
 #include "dyn_arr.tpp"
