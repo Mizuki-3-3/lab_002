@@ -33,7 +33,7 @@ std::vector<std::string> reduce_func_for_float = {"min", "max", "sum", "product"
 std::vector<std::string> reduce_func_for_char = {"кол-во гласных", "кол-во цифр", "кол-во согласных", "самый большой ascii код"};
 
 int selected_item =0, selected_container = 0, selected_data_type = 0, selected_mode = 0,
-    selected_map_func = 0, selected_reduce_func = 0, selected_where_func = 0;
+    func_choice = 0, selected_map_func = 0, selected_reduce_func = 0, selected_where_func = 0;
 std::string last_result;
 
 template<typename V>
@@ -64,8 +64,6 @@ V parse_value(const std::string& s, bool& ok) { //string->other_type
             return val;
         } catch(...) { ok = false; return 0; }
     }
-    ok = false;
-    return V{};
 }
 
 template<typename T>
@@ -158,7 +156,7 @@ void delete_selected() {
 template<typename Seq, Mutability M, typename T>
 void apply_modify_op(Seq& seq, const std::string& val_str, int idx, int /*func_choice*/) {
     try {
-        if (selected_mode == 0 || selected_mode == 1 || selected_mode == 2) {
+        if (selected_mode == 0 || selected_mode == 1 || selected_mode == 2) { // append/prepend/insert
             bool ok = false;
             T val = parse_value<T>(val_str, ok);
             if (!ok) throw invalid_argument();
@@ -174,7 +172,7 @@ void apply_modify_op(Seq& seq, const std::string& val_str, int idx, int /*func_c
             }
             update_display_items();
         }
-        else if (selected_mode == 3) {
+        else if (selected_mode == 3) { // map
             std::function<T(const T&)> f;
             if constexpr (std::is_same_v<T, int>) {
                 switch (selected_map_func) {
@@ -196,7 +194,7 @@ void apply_modify_op(Seq& seq, const std::string& val_str, int idx, int /*func_c
                 }
             } else if constexpr (std::is_same_v<T, char>) {
                 switch (selected_map_func) {
-                    case 0:
+                    case 0: // изменение регистра
                         f = [](char c) {
                             if (std::isupper(static_cast<unsigned char>(c)))
                                 return static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
@@ -208,39 +206,39 @@ void apply_modify_op(Seq& seq, const std::string& val_str, int idx, int /*func_c
                     case 2: f = [](char c) { return c - 1; }; break;
                     default: f = [](char c) { return c; };
                 }
-            } else if constexpr (std::is_same_v<T, bit<BitType>>) {
+            } else if constexpr (std::is_same_v<T, bit<BitType>>) { // BitType
                 switch (selected_map_func) {
-                    case 0: f = []([[maybe_unused]]bit<BitType> x) { return ~x; }; break;
-                    case 1: f = []([[maybe_unused]]bit<BitType> x) { return x << 1; }; break;
-                    case 2: f = []([[maybe_unused]]bit<BitType> x) { return x >> 1; }; break;
-                    case 3: f = []([[maybe_unused]]bit<BitType> x) { return x & 0x5555ULL; }; break;
-                    case 4: f = []([[maybe_unused]]bit<BitType>)   { return 0ULL; }; break;
-                    default: f = []([[maybe_unused]]bit<BitType> x) { return x; };
+                    case 0: f = [](bit<BitType> x) { return ~x; }; break;
+                    case 1: f = [](bit<BitType> x) { return x << 1; }; break;
+                    case 2: f = [](bit<BitType> x) { return x >> 1; }; break;
+                    case 3: f = [](bit<BitType> x) { return x & 0x5555ULL; }; break;
+                    case 4: f = [](bit<BitType>)   { return 0ULL; }; break;
+                    default: f = [](bit<BitType> x) { return x; };
                 }
             }
             seq.map(f);
             update_display_items();
         }
-        else if (selected_mode == 4) {
+        else if (selected_mode == 4) { // reduce
             std::string result_str;
             if constexpr (std::is_same_v<T, int>) {
                 switch (selected_reduce_func) {
-                    case 0: {
+                    case 0: { // min
                         int min_val = seq.reduce([](int a, int b) { return std::min(a, b); }, seq[0]);
                         result_str = std::to_string(min_val);
                         break;
                     }
-                    case 1: {
+                    case 1: { // max
                         int max_val = seq.reduce([](int a, int b) { return std::max(a, b); }, seq[0]);
                         result_str = std::to_string(max_val);
                         break;
                     }
-                    case 2: {
+                    case 2: { // sum
                         int sum = seq.reduce([](int a, int b) { return a + b; }, 0);
                         result_str = std::to_string(sum);
                         break;
                     }
-                    case 3: {
+                    case 3: { // product
                         int prod = seq.reduce([](int a, int b) { return a * b; }, 1);
                         result_str = std::to_string(prod);
                         break;
@@ -249,31 +247,31 @@ void apply_modify_op(Seq& seq, const std::string& val_str, int idx, int /*func_c
                 }
             } else if constexpr (std::is_same_v<T, float>) {
                 switch (selected_reduce_func) {
-                    case 0: {
+                    case 0: { // min
                         float min_val = seq.reduce([](float a, float b) { return std::min(a, b); }, seq[0]);
                         std::ostringstream oss; oss << std::fixed << std::setprecision(2) << min_val;
                         result_str = oss.str();
                         break;
                     }
-                    case 1: {
+                    case 1: { // max
                         float max_val = seq.reduce([](float a, float b) { return std::max(a, b); }, seq[0]);
                         std::ostringstream oss; oss << std::fixed << std::setprecision(2) << max_val;
                         result_str = oss.str();
                         break;
                     }
-                    case 2: {
+                    case 2: { // sum
                         float sum = seq.reduce([](float a, float b) { return a + b; }, 0.0f);
                         std::ostringstream oss; oss << std::fixed << std::setprecision(2) << sum;
                         result_str = oss.str();
                         break;
                     }
-                    case 3: {
+                    case 3: { // product
                         float prod = seq.reduce([](float a, float b) { return a * b; }, 1.0f);
                         std::ostringstream oss; oss << std::fixed << std::setprecision(2) << prod;
                         result_str = oss.str();
                         break;
                     }
-                    case 4: {
+                    case 4: { // average
                         float sum = seq.reduce([](float a, float b) { return a + b; }, 0.0f);
                         float avg = sum / static_cast<float>(seq.size());
                         std::ostringstream oss; oss << std::fixed << std::setprecision(2) << avg;
@@ -294,41 +292,42 @@ void apply_modify_op(Seq& seq, const std::string& val_str, int idx, int /*func_c
                     return std::isdigit(static_cast<unsigned char>(c));
                 };
                 switch (selected_reduce_func) {
-                    case 0: {
+                    case 0: { // количество гласных
                         int count = seq.reduce([is_vowel](int acc, char c) { return acc + (is_vowel(c) ? 1 : 0); }, 0);
                         result_str = std::to_string(count);
                         break;
                     }
-                    case 1: {
+                    case 1: { // количество цифр
                         int count = seq.reduce([is_digit_char](int acc, char c) { return acc + (is_digit_char(c) ? 1 : 0); }, 0);
                         result_str = std::to_string(count);
                         break;
                     }
-                    case 2: {
+                    case 2: { // количество согласных
                         int count = seq.reduce([is_consonant](int acc, char c) { return acc + (is_consonant(c) ? 1 : 0); }, 0);
                         result_str = std::to_string(count);
                         break;
                     }
-                    case 3: {
+                    case 3: { // максимальный ASCII-код
                         int max_ascii = seq.reduce([](int a, char c) { return std::max(a, static_cast<int>(c)); }, static_cast<int>(seq[0]));
                         result_str = std::to_string(max_ascii);
                         break;
                     }
                     default: result_str = "неизвестная функция reduce";
                 }
-            } else if constexpr (std::is_same_v<T, bit<BitType>>) { 
+            } else if constexpr (std::is_same_v<T, bit<BitType>>) { // BitType
+                // Для битовых последовательностей reduce не был определён в интерфейсе, но на всякий случай реализуем
                 switch (selected_reduce_func) {
-                    case 0: {
+                    case 0: { // не ноль (количество ненулевых)
                         int count = seq.reduce([](int acc, bit<BitType> x) { return acc + (x != 0 ? 1 : 0); }, 0);
                         result_str = std::to_string(count);
                         break;
                     }
-                    case 1: {
+                    case 1: { // нечётные (количество)
                         int count = seq.reduce([](int acc, bit<BitType> x) { return acc + ((x & 1) ? 1 : 0); }, 0);
                         result_str = std::to_string(count);
                         break;
                     }
-                    case 2: {
+                    case 2: { // >256 (количество)
                         int count = seq.reduce([](int acc, bit<BitType> x) { return acc + (x > 256 ? 1 : 0); }, 0);
                         result_str = std::to_string(count);
                         break;
@@ -364,7 +363,7 @@ void apply_modify_op(Seq& seq, const std::string& val_str, int idx, int /*func_c
                     case 3: pred = [](char c) { return std::isdigit(static_cast<unsigned char>(c)) != 0; }; break;
                     default: pred = [](char) { return true; };
                 }
-            } else if constexpr (std::is_same_v<T, bit<BitType>>) {
+            } else if constexpr (std::is_same_v<T, bit<BitType>>) { // BitType
                 switch (selected_where_func) {
                     case 0: pred = [](bit<BitType> x) { return x != 0; }; break;
                     case 1: pred = [](bit<BitType> x) { return (x & 1) != 0; }; break;
@@ -398,15 +397,15 @@ void start_() {
 
     std::string input_str;
     std::string input_idx;
-    static int prev_container = selected_container;
-    static int prev_data_type = selected_data_type;
 
+    // Компоненты выбора
     Component container_settings = Container::Vertical({
         Dropdown(container, &selected_container),
         Dropdown(data_type, &selected_data_type),
         Dropdown(mode, &selected_mode)
     });
 
+    // Поля ввода
     Component input_value_append = Input(&input_str, "введите значение") | border;
     Component input_value_prepend = Input(&input_str, "введите значение") | border;
     Component input_value_insert = Container::Vertical({
@@ -414,6 +413,7 @@ void start_() {
         Input(&input_str, "введите значение") | border
     });
 
+    // Вкладки выбора функций
     Component map_functions_int = Dropdown(map_func_for_int, &selected_map_func);
     Component map_functions_float = Dropdown(map_func_for_float, &selected_map_func);
     Component map_functions_char = Dropdown(map_func_for_char, &selected_map_func);
@@ -436,23 +436,26 @@ void start_() {
     }, &selected_data_type);
 
     Component mode_handler = Container::Tab({
-        input_value_append,   
-        input_value_prepend,  
-        input_value_insert,
-        map_tab,
-        reduce_tab,
-        where_tab
+        input_value_append,   // 0
+        input_value_prepend,  // 1
+        input_value_insert,   // 2
+        map_tab,              // 3
+        reduce_tab,           // 4
+        where_tab             // 5
     }, &selected_mode);
 
+    // Меню отображения элементов
     auto menu = Menu(&display_items, &::selected_item);
     auto display_window = menu | Renderer([&](Element inner) {
         return window(text("Список"), inner) | size(HEIGHT, LESS_THAN, 20);
     });
 
+    // Строка состояния
     auto status_line = Renderer([&] {
         return text(last_result) | color(Color::YellowLight);
     });
 
+    // Основной вертикальный контейнер
     Component main_content = Container::Vertical({
         container_settings,
         mode_handler,
@@ -460,6 +463,7 @@ void start_() {
         status_line
     });
 
+    // Получение текущей последовательности
     auto get_current_seq = [&]() -> std::variant<
         list_seq<Mutability::Mutable, int>*,
         list_seq<Mutability::Mutable, float>*,
@@ -484,9 +488,10 @@ void start_() {
         } else if (selected_container == 2) { // bit
             return &my_bit_seq;
         }
-        return &my_list_i;
+        return &my_list_i; // fallback
     };
 
+    // Обработчик событий
     auto event_handler = CatchEvent(main_content, [&](Event event) {
         if (event == Event::Return) {
             int idx = -1;
@@ -514,19 +519,15 @@ void start_() {
         return false;
     });
 
+    // Финальный рендерер
     auto final_renderer = Renderer(event_handler, [&] {
-        if (prev_container != selected_container || prev_data_type != selected_data_type) {
-            prev_container = selected_container;
-            prev_data_type = selected_data_type;
-            update_display_items();
-        }
         return hbox({
             vbox({container_settings->Render()}) | vcenter,
             separator(),
             vbox({mode_handler->Render()}) | vcenter,
             separator(),
             vbox({
-                text("Элементы ") | center,
+                text("Элементы (выберите и нажмите Delete)") | center,
                 menu->Render() | vscroll_indicator | frame | size(HEIGHT, GREATER_THAN, 10),
                 separator(),
                 status_line->Render() | center
@@ -537,4 +538,11 @@ void start_() {
     });
 
     screen.Loop(final_renderer);
+}
+
+
+
+int main(){
+    start_();
+    return 0;
 }

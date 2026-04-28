@@ -1,4 +1,5 @@
 *.exe
 *.o
 *.a
-build
+*.vscode
+.gitignore

@@ -96,7 +96,6 @@ TEST(reduce_mutable_list_mult) {
     delete seq;
 }
 
-
 TEST(reduce_immutable_list_sum) {
     int init[] = {1,2,3,4};
     list_seq<Mutability::Immutable, int>* seq = new list_seq<Mutability::Immutable, int>(init, 4);
@@ -113,29 +112,24 @@ TEST(reduce_immutable_list_mult) {
     delete seq;
 }
 
-
 TEST(reduce_empty_array_throws) {
     array_seq<Mutability::Mutable, int>* seq = new array_seq<Mutability::Mutable, int>();
-    errors err = NO_ERR;
-    TRY {
+    try {
         seq->reduce(sum, 0);
+        assert(false && "Expected empty_container exception");
     }
-    CATCH(err) {
-        assert(err == ERR_INCORRECT_INDEX);
+    catch (const empty_container& e) {
     }
-    ETRY;
     delete seq;
 }
 
 TEST(reduce_empty_list_throws) {
     list_seq<Mutability::Immutable, int>* seq = new list_seq<Mutability::Immutable, int>();
-    errors err = NO_ERR;
-    TRY {
+    try {
         seq->reduce(sum, 0);
+        assert(false && "Expected empty_container exception");
     }
-    CATCH(err) {
-        assert(err == ERR_INCORRECT_INDEX);
+    catch (const empty_container& e) {
     }
-    ETRY;
     delete seq;
 }

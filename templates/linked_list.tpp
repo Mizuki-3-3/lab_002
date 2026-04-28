@@ -61,11 +61,11 @@ s_list<T>::s_list(unsigned initial_size) : length(initial_size) {
         return;
     }
     head = new node<T>(T());
-    if (head == nullptr) THROW(ERR_MEMORY);
+    if (head == nullptr) throw null_ptr();
     node<T>* curr = head;
     for (unsigned i = 1; i < initial_size; ++i) {
         curr->next = new node<T>(T());
-        if (curr->next == nullptr) THROW(ERR_MEMORY);
+        if (curr->next == nullptr) throw null_ptr();
         curr = curr->next;
     }
     tail = curr;
@@ -78,13 +78,13 @@ s_list<T>::s_list(const T* data, unsigned initial_size) : length(initial_size) {
         head = tail = nullptr;
         return;
     }
-    if (data == nullptr) THROW(ERR_NULL);
+    if (data == nullptr) throw null_ptr();
     head = new node<T>(data[0]);
-    if (head == nullptr) THROW(ERR_MEMORY);
+    if (head == nullptr) throw null_ptr();
     node<T>* curr = head;
     for (unsigned i = 1; i < initial_size; ++i) {
         curr->next = new node<T>(data[i]);
-        if (curr->next == nullptr) THROW(ERR_MEMORY);
+        if (curr->next == nullptr) throw null_ptr();
         curr = curr->next;
     }
     tail = curr;
@@ -98,12 +98,12 @@ s_list<T>::s_list(const s_list& other) : length(other.length) {
         return;
     }
     head = new node<T>(other.head->value);
-    if (head == nullptr) THROW(ERR_MEMORY);
+    if (head == nullptr) throw null_ptr();
     node<T>* curr = head;
     node<T>* other_current = other.head->next;
     while (other_current) {
         curr->next = new node<T>(other_current->value);
-        if (curr->next == nullptr) THROW(ERR_MEMORY);
+        if (curr->next == nullptr) throw null_ptr();
         curr = curr->next;
         other_current = other_current->next;
     }
@@ -123,7 +123,7 @@ s_list<T>::~s_list() {
 
 template <typename T>
 T& s_list<T>::operator[](unsigned index) {
-    if (index >= length) THROW(ERR_INCORRECT_INDEX);
+    if (index >= length) throw index_out_of_range();
     node<T>* curr = head;
     for (unsigned i = 0; i < index; ++i) curr = curr->next;
     return curr->value;
@@ -131,7 +131,7 @@ T& s_list<T>::operator[](unsigned index) {
 
 template <typename T>
 const T& s_list<T>::operator[](unsigned index) const {
-    if (index >= length) THROW(ERR_INCORRECT_INDEX);
+    if (index >= length) throw index_out_of_range();
     node<T>* curr = head;
     for (unsigned i = 0; i < index; ++i) curr = curr->next;
     return curr->value;
@@ -169,13 +169,13 @@ unsigned s_list<T>::size() const { return length; }
 
 template <typename T>
 T s_list<T>::get_first() const {
-    if (length == 0) THROW(ERR_INCORRECT_INDEX);
+    if (length == 0) throw empty_container();
     return head->value;
 }
 
 template <typename T>
 T s_list<T>::get_last() const {
-    if (length == 0) THROW(ERR_INCORRECT_INDEX);
+    if (length == 0) throw empty_container();
     return tail->value;
 }
 
@@ -197,7 +197,7 @@ typename s_list<T>::const_iterator s_list<T>::end() const {
 
 template <typename T>
 s_list<T> s_list<T>::slice(unsigned start, unsigned end) {
-    if (start > end || end > length) THROW(ERR_INCORRECT_INDEX);
+    if (start > end || end > length) throw index_out_of_range();
     s_list<T> result(end - start);
     node<T>* cur = head;
     node<T>* cur_r = result.head;

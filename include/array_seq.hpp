@@ -46,9 +46,7 @@ public:
 
     template <typename Func, typename U>
     U reduce(Func f, U initial) const;
-
-    using iterator = typename dyn_arr<T>::iterator;
-    using const_iterator = typename dyn_arr<T>::const_iterator;
+    using value_type = T;
 };
 
 #include "array_seq.tpp"

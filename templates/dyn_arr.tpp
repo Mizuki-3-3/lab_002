@@ -59,20 +59,20 @@ dyn_arr<T>::dyn_arr() : data(nullptr), length(0) {}
 
 template<typename T>
  dyn_arr<T>::dyn_arr(unsigned initial_size) : data(new T[initial_size]), length(initial_size) {
-    if (data == nullptr) THROW(ERR_MEMORY);
+    if (data == nullptr) throw null_ptr();
 }
 
 template<typename T>
 dyn_arr<T>::dyn_arr(const T* items, unsigned initial_size) : data(new T[initial_size]), length(initial_size) {
-    if (data == nullptr) THROW(ERR_MEMORY);
-    if (items == nullptr && initial_size > 0) THROW(ERR_NULL);
+    if (data == nullptr) throw null_ptr();
+    if (items == nullptr && initial_size > 0) throw null_ptr();
     for (unsigned i = 0; i < length; ++i)
         data[i] = items[i];
 }
 
 template<typename T>
 dyn_arr<T>::dyn_arr(const dyn_arr& other) : data(new T[other.length]), length(other.length) {
-    if (data == nullptr) THROW(ERR_MEMORY);
+    if (data == nullptr) throw null_ptr();
     for (unsigned i = 0; i < length; ++i)
         data[i] = other.data[i];
 }
@@ -82,13 +82,13 @@ dyn_arr<T>::~dyn_arr() { delete[] data; }
 
 template<typename T>
 T& dyn_arr<T>::operator[](unsigned index) {
-    if (index >= length) THROW(ERR_INCORRECT_INDEX);
+    if (index >= length) throw index_out_of_range();
     return data[index];
 }
 
 template<typename T>
 const T& dyn_arr<T>::operator[](unsigned index) const {
-    if (index >= length) THROW(ERR_INCORRECT_INDEX);
+    if (index >= length) throw index_out_of_range();
     return data[index];
 }
 
@@ -118,7 +118,7 @@ dyn_arr<T>& dyn_arr<T>::operator=(dyn_arr other) {
 template<typename T>
 void dyn_arr<T>::resize(unsigned new_size) {
     T* new_data = new T[new_size];
-    if (new_data == nullptr) THROW(ERR_MEMORY);
+    if (new_data == nullptr) throw null_ptr();
     unsigned copy_size = (new_size < length) ? new_size : length;
     for (unsigned i = 0; i < copy_size; ++i)
         new_data[i] = data[i];

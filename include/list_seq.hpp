@@ -38,13 +38,14 @@ public:
     auto end()   const { return list->end(); }
 
     template <typename Func>
-    list_seq<M,T>* map(Func f);
+    sequence<T>* map(Func f);
 
     template <typename Func>
-    list_seq<M,T>* where(Func f);
+    sequence<T>* where(Func f);
 
     template <typename Func, typename U>
     U reduce(Func f, U initial) const;
+    using value_type = T;
 };
 
 #include "list_seq.tpp"

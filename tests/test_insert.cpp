@@ -2,6 +2,7 @@
 #include "list_seq.hpp"
 #include "assertions.hpp"
 #include "tests.hpp"
+#include "errors.hpp"   // новый заголовок с классами исключений
 
 TEST(insert_mutable_array_nonempty_begin) {
     int init[] = {1, 2, 3};
@@ -171,133 +172,119 @@ TEST(insert_immmutable_list_nonempty_size_index){
     delete new_seq;
 }
 
+// ----- Новые версии тестов с исключениями -----
+
 TEST(insert_immmutable_list_incorrect_index_test){
     list_seq<Mutability::Immutable, int>* seq = new list_seq<Mutability::Immutable, int>();
-    sequence<int>* new_seq = new list_seq<Mutability::Immutable, int>();
-    errors err = NO_ERR;
-    TRY{
+    sequence<int>* new_seq = nullptr;
+    try {
         new_seq = seq->insert(2947, 1);
+        assert(false && "Expected index_out_of_range exception");
     }
-    CATCH(err) {
-        assert(err == ERR_INCORRECT_INDEX);
+    catch (const index_out_of_range& e) {
+        // ожидаемое исключение
     }
-    ETRY;
     assert(seq->size() == 0);
-    
     delete new_seq;
     delete seq;
 }
 
 TEST(insert_mmutable_list_incorrect_index_test){
-    list_seq<Mutability::Immutable, int>* seq = new list_seq<Mutability::Immutable, int>();
-    errors err = NO_ERR;
-    TRY{
+    list_seq<Mutability::Mutable, int>* seq = new list_seq<Mutability::Mutable, int>();
+    try {
         seq->insert(2947, 1);
+        assert(false && "Expected index_out_of_range exception");
     }
-    CATCH(err) {
-        assert(err == ERR_INCORRECT_INDEX);
+    catch (const index_out_of_range& e) {
+        // ожидаемое исключение
     }
-    ETRY;
     assert(seq->size() == 0);
-    
     delete seq;
 }
 
 TEST(insert_immmutable_array_incorrect_index_test){
     array_seq<Mutability::Immutable, int>* seq = new array_seq<Mutability::Immutable, int>();
-    sequence<int>* new_seq = new list_seq<Mutability::Immutable, int>();
-    errors err = NO_ERR;
-    TRY{
+    sequence<int>* new_seq = nullptr;
+    try {
         new_seq = seq->insert(2947, 1);
+        assert(false && "Expected index_out_of_range exception");
     }
-    CATCH(err) {
-        assert(err == ERR_INCORRECT_INDEX);
+    catch (const index_out_of_range& e) {
+        // OK
     }
-    ETRY;
     assert(seq->size() == 0);
-    
     delete new_seq;
     delete seq;
 }
 
 TEST(insert_mmutable_array_incorrect_index_test){
-    array_seq<Mutability::Immutable, int>* seq = new array_seq<Mutability::Immutable, int>();
-    errors err = NO_ERR;
-    TRY{
+    array_seq<Mutability::Mutable, int>* seq = new array_seq<Mutability::Mutable, int>();
+    try {
         seq->insert(2947, 1);
+        assert(false && "Expected index_out_of_range exception");
     }
-    CATCH(err) {
-        assert(err == ERR_INCORRECT_INDEX);
+    catch (const index_out_of_range& e) {
+        // OK
     }
-    ETRY;
     assert(seq->size() == 0);
     delete seq;
 }
 
 TEST(insert_immmutable_list_negative_index_test){
     list_seq<Mutability::Immutable, int>* seq = new list_seq<Mutability::Immutable, int>();
-    sequence<int>* new_seq = new list_seq<Mutability::Immutable, int>();
-    errors err = NO_ERR;
-    TRY{
+    sequence<int>* new_seq = nullptr;
+    try {
         new_seq = seq->insert(2947, -1231);
+        assert(false && "Expected index_out_of_range exception");
     }
-    CATCH(err) {
-        assert(err == ERR_INCORRECT_INDEX);
+    catch (const index_out_of_range& e) {
+        // OK
     }
-    ETRY;
     assert(seq->size() == 0);
-    
     delete new_seq;
     delete seq;
 }
 
 TEST(insert_mmutable_list_negative_index_test){
-    list_seq<Mutability::Immutable, int>* seq = new list_seq<Mutability::Immutable, int>();
-    errors err = NO_ERR;
-    TRY{
+    list_seq<Mutability::Mutable, int>* seq = new list_seq<Mutability::Mutable, int>();
+    try {
         seq->insert(2947, -21);
+        assert(false && "Expected index_out_of_range exception");
     }
-    CATCH(err) {
-        assert(err == ERR_INCORRECT_INDEX);
+    catch (const index_out_of_range& e) {
+        // OK
     }
-    ETRY;
     assert(seq->size() == 0);
-    
     delete seq;
 }
 
 TEST(insert_immmutable_array_negative_index_test){
     array_seq<Mutability::Immutable, int>* seq = new array_seq<Mutability::Immutable, int>();
-    sequence<int>* new_seq = new list_seq<Mutability::Immutable, int>();
-    errors err = NO_ERR;
-    TRY{
+    sequence<int>* new_seq = nullptr;
+    try {
         new_seq = seq->insert(2947, -23);
+        assert(false && "Expected index_out_of_range exception");
     }
-    CATCH(err) {
-        assert(err == ERR_INCORRECT_INDEX);
+    catch (const index_out_of_range& e) {
+        // OK
     }
-    ETRY;
     assert(seq->size() == 0);
-    
     delete new_seq;
     delete seq;
 }
 
 TEST(insert_mmutable_array_negative_index_test){
-    array_seq<Mutability::Immutable, int>* seq = new array_seq<Mutability::Immutable, int>();
-    errors err = NO_ERR;
-    TRY{
+    array_seq<Mutability::Mutable, int>* seq = new array_seq<Mutability::Mutable, int>();
+    try {
         seq->insert(2947, -24);
+        assert(false && "Expected index_out_of_range exception");
     }
-    CATCH(err) {
-        assert(err == ERR_INCORRECT_INDEX);
+    catch (const index_out_of_range& e) {
+        // OK
     }
-    ETRY;
     assert(seq->size() == 0);
-    
     delete seq;
 }
-
 
 TEST(insert_mutable_array_middle) {
     int init[] = {1, 2, 3};

@@ -3,25 +3,15 @@
 #include <cctype>
 #include <ftxui/dom/elements.hpp>
 #include <ftxui/component/component.hpp>
-#include <ftxui/component/screen_interactive.hpp>  // используем современный API
+#include <ftxui/component/screen_interactive.hpp>
 #include "list_seq.hpp"
 #include "array_seq.hpp"
+#include "bit_seq.hpp"
 #include "Mutability.hpp"
+#include <cmath>
 
 template<typename T>
 std::string to_string_impl(const T& value);
-
-template<typename T>
-T parse_value(const std::string& s, bool& ok);
-
-template<>
-int parse_value<int>(const std::string& s, bool& ok);
-template<>
-float parse_value<float>(const std::string& s, bool& ok);
-template<>
-char parse_value<char>(const std::string& s, bool& ok);
-template<>
-std::string parse_value<std::string>(const std::string& s, bool& ok);
 
 class ElementArray {
     std::unique_ptr<ftxui::Element[]> data_;
@@ -37,13 +27,4 @@ public:
     size_t size() const { return size_; }
 };
 
-template <typename T>
-ftxui::Element draw_list(list_seq<Mutability::Mutable, T>& list);
-
-template <typename T>
-ftxui::Element draw_array(array_seq<Mutability::Mutable, T>& array);
-template<typename Seq, typename T>
-void apply_to_seq(Seq& seq, int op, const std::string& val_str, int index, int func_choice, std::string& result_msg);
-void apply_operation(int cont, int dtype, int op,
-                     const std::string& val_str, int index, int func_choice);
 void start_();

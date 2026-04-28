@@ -3,22 +3,22 @@
 
 template<Mutability M, typename T>
 list_seq<M,T>::list_seq() : list(new s_list<T>()) {
-    if (list == nullptr) THROW(ERR_MEMORY);
+    if (list == nullptr) throw null_ptr();
 }
 
 template<Mutability M, typename T>
 list_seq<M,T>::list_seq(const s_list<T>& other) : list(new s_list<T>(other)) {
-    if (list == nullptr) THROW(ERR_MEMORY);
+    if (list == nullptr) throw null_ptr();
 }
 
 template<Mutability M, typename T>
 list_seq<M,T>::list_seq(const T* items, unsigned count) : list(new s_list<T>(items, count)) {
-    if (list == nullptr) THROW(ERR_MEMORY);
+    if (list == nullptr) throw null_ptr();
 }
 
 template<Mutability M, typename T>
 list_seq<M,T>::list_seq(const list_seq& other) : list(new s_list<T>(*other.list)) {
-    if (list == nullptr) THROW(ERR_MEMORY);
+    if (list == nullptr) throw null_ptr();
 }
 
 template<Mutability M, typename T>
@@ -28,7 +28,7 @@ template<Mutability M, typename T>
 list_seq<M,T>& list_seq<M,T>::operator=(const list_seq& other) {
     if (this != &other) {
         s_list<T>* new_list = new s_list<T>(*other.list);
-        if (new_list == nullptr) THROW(ERR_MEMORY);
+        if (new_list == nullptr) throw null_ptr();
         delete list;
         list = new_list;
     }
@@ -55,7 +55,7 @@ sequence<T>* list_seq<M,T>::append(const T& item) {
     unsigned new_size = list->size() + 1;
     s_list<T>* new_list = new s_list<T>(new_size);
     
-    if (!new_list) THROW(ERR_MEMORY);
+    if (!new_list) throw null_ptr();
 
     for (unsigned i = 0; i < list->size(); ++i)
         (*new_list)[i] = (*list)[i];
@@ -75,7 +75,7 @@ sequence<T>* list_seq<M,T>::prepend(const T& item) {
     unsigned new_size = list->size() + 1;
     s_list<T>* new_list = new s_list<T>(new_size);
 
-    if (!new_list) THROW(ERR_MEMORY);
+    if (!new_list) throw null_ptr();
 
     (*new_list)[0] = item;
     for (unsigned i = 0; i < list->size(); ++i)
@@ -92,13 +92,13 @@ sequence<T>* list_seq<M,T>::prepend(const T& item) {
 
 template<Mutability M, typename T>
 sequence<T>* list_seq<M,T>::insert(const T& item, unsigned index) {
-    if (index > list->size()) THROW(ERR_INCORRECT_INDEX);
+    if (index > list->size()) throw index_out_of_range();
     if (index == 0) return prepend(item);
     if (index == list->size()) return append(item);
 
     unsigned new_size = list->size() + 1;
     s_list<T>* new_list = new s_list<T>(new_size);
-    if (!new_list) THROW(ERR_MEMORY);
+    if (!new_list) throw null_ptr();
 
     for (unsigned i = 0; i < index; ++i)
         (*new_list)[i] = (*list)[i];
@@ -117,10 +117,10 @@ sequence<T>* list_seq<M,T>::insert(const T& item, unsigned index) {
 
 template<Mutability M, typename T>
 sequence<T>* list_seq<M,T>::get_subsequence(unsigned start, unsigned end) const {
-    if (start > end || end > size()) THROW(ERR_INCORRECT_INDEX);
+    if (start > end || end > size()) throw index_out_of_range();
     unsigned sub_size = end - start;
     s_list<T>* sub_list = new s_list<T>(sub_size);
-    if (!sub_list) THROW(ERR_MEMORY);
+    if (!sub_list) throw null_ptr();
     for (unsigned i = start; i < end; ++i)
         (*sub_list)[i - start] = (*list)[i];
     return new list_seq<Mutability::Immutable, T>(*sub_list);
@@ -132,7 +132,7 @@ unsigned list_seq<M,T>::find(const T& value) const {
     for (auto it = list->begin(); it != list->end(); ++it, ++idx) {
         if (*it == value) return idx;
     }
-    THROW(ERR_INCORRECT_INDEX);
+    throw invalid_argument();
     return 0;
 }
 
@@ -148,14 +148,14 @@ const T& list_seq<M,T>::operator[](unsigned index) const {
 
 template<Mutability M, typename T>
 template <typename Func>
-list_seq<M,T>* list_seq<M,T>::map(Func f) {
+sequence<T>* list_seq<M,T>::map(Func f) {
     if constexpr(M == Mutability::Mutable) {
         for (auto& x : *list) x = f(x);
         return this;
     } else {
         list_seq<Mutability::Immutable, T>* new_l =
             new list_seq<Mutability::Immutable, T>(*list);
-        if (!new_l) THROW(ERR_MEMORY);
+        if (!new_l) throw null_ptr();
         for (auto& x : *new_l) x = f(x);
         return new_l;
     }
@@ -163,13 +163,13 @@ list_seq<M,T>* list_seq<M,T>::map(Func f) {
 
 template<Mutability M, typename T>
 template <typename Func>
-list_seq<M,T>* list_seq<M,T>::where(Func f) {
+sequence<T>* list_seq<M,T>::where(Func f) {
     unsigned count = 0;
     for (unsigned i = 0; i < list->size(); ++i)
         if (f((*list)[i])) ++count;
 
     s_list<T>* new_list = new s_list<T>(count);
-    if (!new_list) THROW(ERR_MEMORY);
+    if (!new_list) throw null_ptr();
 
     unsigned j = 0;
     for (unsigned i = 0; i < list->size(); ++i) {
@@ -189,7 +189,7 @@ list_seq<M,T>* list_seq<M,T>::where(Func f) {
 template<Mutability M, typename T>
 template <typename Func, typename U>
 U list_seq<M,T>::reduce(Func f, U initial) const {
-    if (list->size() == 0) THROW(ERR_INCORRECT_INDEX);
+    if (list->size() == 0) throw empty_container();
     U acc = f(initial, (*list)[0]);
     for (unsigned i = 1; i < list->size(); ++i) {
         acc = f(acc, (*list)[i]);
@@ -199,10 +199,10 @@ U list_seq<M,T>::reduce(Func f, U initial) const {
 
 template<Mutability M, typename T>
 sequence<T>* list_seq<M,T>::concat(sequence<T>* other) {
-    if (!other) THROW(ERR_NULL);
+    if (!other) throw null_ptr();
     unsigned new_size = list->size() + other->size();
     s_list<T>* new_list = new s_list<T>(new_size);
-    if (!new_list) THROW(ERR_MEMORY);
+    if (!new_list) throw null_ptr();
 
     for (unsigned i = 0; i < list->size(); ++i)
         (*new_list)[i] = (*list)[i];

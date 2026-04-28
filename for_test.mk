@@ -3,7 +3,7 @@ CPPFLAGS = -Iinclude -Itemplates -Itests -Wall -Wextra -std=c++17
 
 OBJS = assertions.o
 
-TARGET = test_.exe
+TARGET = testing.exe
 
 TESTS = tests/test_append.cpp tests/test_prepend.cpp tests/test_insert.cpp tests/test_map.cpp tests/test_reduce.cpp tests/test_where.cpp tests/test_main.cpp
 
